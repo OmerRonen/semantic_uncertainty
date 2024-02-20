@@ -117,7 +117,7 @@ if __name__ == '__main__':
                 if n_batches > 10:
                     break
                 q = batch['question'][0]
-                inpt = f"This is a bot that correctly answers questions. \n Question: {q} ? Answer: "
+                inpt = f"This is a bot that correctly answers questions. \n Question: {q}? Your answer:"
                 input_ids = tokenizer.encode(inpt, return_tensors='pt').to(device)
                 print(input_ids.shape)
                 # input_ids = batch['input_ids'].to(device).reshape(
