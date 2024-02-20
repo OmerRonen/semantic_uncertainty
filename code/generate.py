@@ -119,6 +119,7 @@ if __name__ == '__main__':
 
                 input_ids = torch.cat([batch['input_ids']]).to(device).reshape(
                     1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
+                input_ids = input_ids.to(dtype=torch.long)
                 if args.decoding_method == 'beam_search':
                     most_likely_generation = model.generate(input_ids,
                                                             num_beams=5,
