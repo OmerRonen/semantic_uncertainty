@@ -24,14 +24,14 @@ parser.add_argument('--temperature', type=float, default='1.0')
 parser.add_argument('--num_beams', type=int, default='5')
 parser.add_argument('--decoding_method', type=str, default='beam_search')
 parser.add_argument('--top_p', type=float, default=1.0)
-parser.add_argument('--dataset', type=str, default='coqa')
+parser.add_argument('--dataset', type=str, default='trivia_qa')
 args = parser.parse_args()
 
 wandb.init(project='nlg_uncertainty', id=args.run_id, config=args, resume='allow')
 
 run_name = wandb.run.name
 
-device = 'cuda'
+device = 'cuda' if
 
 # Set a seed value
 seed_value = 10
@@ -107,8 +107,9 @@ def get_generations(model, dataloader, number_of_generations):
         max_length_of_generated_sequence = 256
         sequences = []
         for batch in tqdm.tqdm(dataloader):
+            print(batch)
 
-            input_ids = torch.cat(batch['input_ids']).to(device).reshape(
+            input_ids = torch.cat([batch['input_ids']]).to(device).reshape(
                 1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
             if args.decoding_method == 'beam_search':
                 most_likely_generation = model.generate(input_ids,

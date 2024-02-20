@@ -8,6 +8,8 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 import config
 
+
+
 with open(f'{config.data_dir}/coqa-dev-v1.0.json', 'r') as infile:
     data = json.load(infile)['data']
 
