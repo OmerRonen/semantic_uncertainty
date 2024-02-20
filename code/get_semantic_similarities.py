@@ -58,10 +58,10 @@ if __name__ == '__main__':
 
     for sample in tqdm(sequences):
         question = sample['question']
-        if 'cleaned_generated_texts' in sample:
-            generated_texts = sample['cleaned_generated_texts']
-        else:
-            generated_texts = sample['generated_texts']
+        # if 'cleaned_generated_texts' in sample:
+        #     generated_texts = sample['cleaned_generated_texts']
+        # else:
+        generated_texts = sample['generated_texts']
 
         id_ = sample['id'][0]
 
