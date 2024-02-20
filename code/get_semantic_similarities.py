@@ -18,7 +18,7 @@ parser.add_argument('--generation_model', type=str, default='opt-2.7b')
 parser.add_argument('--run_id', type=str, default='run_1')
 args = parser.parse_args()
 
-device = 'cuda'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Set a seed value
 seed_value = 10
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     generation_tokenizer = AutoTokenizer.from_pretrained(f"facebook/opt-350m", use_fast=False, cache_dir=config.data_dir)
 
     tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-large-mnli")
-    model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-large-mnli").cuda()
+    model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-large-mnli").to(device)
 
     wandb.init(project='nlg_uncertainty', id=args.run_id, config=args, resume='allow')
 
