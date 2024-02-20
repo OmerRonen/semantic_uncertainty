@@ -31,7 +31,7 @@ wandb.init(project='nlg_uncertainty', id=args.run_id, config=args, resume='allow
 
 run_name = wandb.run.name
 
-device = 'cuda' if
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Set a seed value
 seed_value = 10
