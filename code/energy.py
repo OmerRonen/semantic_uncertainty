@@ -40,6 +40,7 @@ def calculate_energy(X, model, mu=None, sigma=None, batch_size=32, fast=True):
 def get_energy_logits(pre_softmax):
     energy_total = None
     temp = 1
+    vocab_size = pre_softmax.shape[2]
     for i in range(pre_softmax.shape[1]):
         token_pre_softmax = pre_softmax[:, i, :]
         token_pre_softmax = token_pre_softmax / temp
@@ -51,9 +52,9 @@ def get_energy_logits(pre_softmax):
         energy = factor_mul_log + torch.log(torch.sum((probs ** 2))) + -2 * log_c
 
         if energy_total is None:
-            energy_total = energy
+            energy_total = energy / vocab_size
         else:
-            energy_total += energy
+            energy_total += energy / vocab_size
 
     return energy_total
 
