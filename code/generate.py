@@ -116,7 +116,7 @@ if __name__ == '__main__':
                 # print(batch)
                 if n_batches > 10:
                     break
-                input_ids = tokenizer.encode(batch['question'], return_tensors='pt')
+                input_ids = tokenizer.encode(batch['question'], return_tensors='pt').to(device)
                 print(input_ids.shape)
                 # input_ids = batch['input_ids'].to(device).reshape(
                 #     1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
