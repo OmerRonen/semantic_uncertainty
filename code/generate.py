@@ -229,6 +229,7 @@ if __name__ == '__main__':
                     for answer in reference_answers:
                         predictions = [sequence_dict['most_likely_generation'].lstrip()]
                         references = [answer]
+                        print(f"predictions: {predictions}\nreferences: {references}")
                         results = exact_match_metric.compute(predictions=predictions,
                                                              references=references,
                                                              ignore_case=True,
