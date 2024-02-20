@@ -61,7 +61,7 @@ def get_energy_logits(pre_softmax):
             energy_total = energy / vocab_size
         else:
             energy_total += energy / vocab_size
-    print(energies)
+    print(np.mean(energies))
     return energy_total
 
 
