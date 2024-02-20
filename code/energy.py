@@ -47,7 +47,7 @@ def get_energy_logits(pre_softmax):
         token_pre_softmax = pre_softmax[:, i, :]
         token_pre_softmax = token_pre_softmax / temp
         probs = torch.softmax(token_pre_softmax, dim=-1)
-        print(probs)
+        print(probs.min())
 
         log_c = token_pre_softmax.logsumexp(dim=-1)
         one_over_probs = 1 / probs  # torch.clamp(1 / probs, min=1e-10, max=1e10)
