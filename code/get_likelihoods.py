@@ -63,10 +63,10 @@ def get_neg_loglikelihoods(model, sequences):
         for sample in sequences:
             result_dict = {}
             prompt = sample['prompt']
-            if 'cleaned_generations' in sample:
-                generations = sample['cleaned_generations'].to(device)
-            else:
-                generations = sample['generations'].to(device)
+            # if 'cleaned_generations' in sample:
+            #     generations = sample['cleaned_generations'].to(device)
+            # else:
+            generations = sample['generations'].to(device)
             id_ = sample['id']
 
             average_neg_log_likelihoods = torch.zeros((generations.shape[0],))
