@@ -116,7 +116,7 @@ if __name__ == '__main__':
                 # print(batch)
                 if n_batches > 10:
                     break
-                input_ids = tokenizer.encode(batch['question'], return_tensors='pt').to(device)
+                input_ids = tokenizer.encode(batch['question'][0], return_tensors='pt').to(device)
                 print(input_ids.shape)
                 # input_ids = batch['input_ids'].to(device).reshape(
                 #     1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
@@ -147,7 +147,7 @@ if __name__ == '__main__':
                 generation_no_input = most_likely_generation[:, input_length:]
                 # print the generation
                 for i in range(generation_no_input.shape[0]):
-                    txt = (f"question: {tokenizer.decode(input_ids[i])} \n"
+                    txt = (f"question: {tokenizer.decode(input_ids[0])} \n"
                            f"generation: {tokenizer.decode(generation_no_input[i])}")
                     print(txt)
                 generations = torch.ones((number_of_generations, input_length + max_length_of_generated_sequence),
