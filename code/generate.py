@@ -120,6 +120,9 @@ if __name__ == '__main__':
                 input_ids = torch.cat([batch['input_ids']]).to(device).reshape(
                     1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
                 input_ids = input_ids.to(dtype=torch.long)
+                # print the question
+                for i in range(input_ids.shape[0]):
+                    print(tokenizer.decode(input_ids[i]))
                 if args.decoding_method == 'beam_search':
                     most_likely_generation = model.generate(input_ids,
                                                             num_beams=5,
@@ -139,6 +142,12 @@ if __name__ == '__main__':
                                                             bad_words_ids=question_framing_ids)
 
                 input_length = input_ids.shape[1] if args.dataset == 'trivia_qa' else batch['input_ids'].shape[1]
+                generation_no_input = generation[:, input_length:]
+                # print the generation
+                for i in range(generation_no_input.shape[0]):
+                    txt = (f"question: {tokenizer.decode(input_ids[i])} \n"
+                           f"generation: {tokenizer.decode(generation_no_input[i])}")
+                    print(txt)
                 generations = torch.ones((number_of_generations, input_length + max_length_of_generated_sequence),
                                          dtype=torch.long,
                                          device=device)
