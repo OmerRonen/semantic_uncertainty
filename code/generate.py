@@ -79,7 +79,7 @@ elif args.dataset == 'trivia_qa':
 
 
 model = AutoModelForCausalLM.from_pretrained(f"facebook/{args.model}",
-                                             torch_dtype=torch.float16,
+                                             torch_dtype=torch.float32,
                                              cache_dir=config.hf_cache_dir).to(device=device)
 
 if args.model == 'opt-30b':
