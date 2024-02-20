@@ -116,13 +116,14 @@ if __name__ == '__main__':
                 # print(batch)
                 if n_batches > 10:
                     break
-
-                input_ids = torch.cat([batch['input_ids']]).to(device).reshape(
+                print(batch['input_ids'].shape)
+                input_ids = batch['input_ids'].to(device).reshape(
                     1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
                 input_ids = input_ids.to(dtype=torch.long)
                 # print the question
                 for i in range(input_ids.shape[0]):
-                    print(tokenizer.decode(input_ids[i]))
+                    ques = tokenizer.decode(input_ids[i])
+                    print("q: ", ques)
                 if args.decoding_method == 'beam_search':
                     most_likely_generation = model.generate(input_ids,
                                                             num_beams=5,
