@@ -114,7 +114,7 @@ if __name__ == '__main__':
             n_batches = 0
             for batch in tqdm.tqdm(dataloader):
                 # print(batch)
-                if n_batches > 10:
+                if n_batches > 100:
                     break
                 q = batch['question'][0]
                 inpt = f"This is a bot that correctly answers questions. \n Question: {q} Answer:"
@@ -152,7 +152,7 @@ if __name__ == '__main__':
                 # print the generation
                 for i in range(generation_no_input.shape[0]):
                     txt = f"generation full: {tokenizer.decode(most_likely_generation[i])}"
-                    answers_most_likely.append(tokenizer.decode(generation_no_input[i]))
+                    answers_most_likely.append(tokenizer.decode(generation_no_input[i], skip_special_tokens=True))
                     print(txt)
                 generations = torch.ones((number_of_generations, input_length + max_length_of_generated_sequence),
                                          dtype=torch.long,
