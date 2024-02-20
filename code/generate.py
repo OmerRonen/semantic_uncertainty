@@ -117,7 +117,7 @@ if __name__ == '__main__':
                 if n_batches > 10:
                     break
                 q = batch['question'][0]
-                inpt = f"Question: {q} ? Answer: "
+                inpt = f"This is a bot that correctly answers questions. \n Question: {q} ? Answer: "
                 input_ids = tokenizer.encode(inpt, return_tensors='pt').to(device)
                 print(input_ids.shape)
                 # input_ids = batch['input_ids'].to(device).reshape(
@@ -135,7 +135,7 @@ if __name__ == '__main__':
                                                             max_length=input_ids.shape[1] +
                                                                        max_length_of_generated_sequence,
                                                             eos_token_id=period_token_id,
-                                                            # bad_words_ids=question_framing_ids
+                                                            bad_words_ids=question_framing_ids
                                                             )
                 elif args.decoding_method == 'greedy':
                     most_likely_generation = model.generate(input_ids,
