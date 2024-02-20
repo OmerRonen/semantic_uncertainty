@@ -94,7 +94,7 @@ def get_neg_loglikelihoods(model, sequences):
                 average_neg_log_likelihood = model_output['loss']
 
                 average_unconditioned_neg_log_likelihood = unconditioned_model_output['loss']
-                print(model_output['logits'].shape)
+                # print(model_output['logits'].shape)
                 energies[generation_index] = get_energy_logits(model_output['logits'])
                 average_neg_log_likelihoods[generation_index] = average_neg_log_likelihood
                 average_unconditioned_neg_log_likelihoods[generation_index] = average_unconditioned_neg_log_likelihood
