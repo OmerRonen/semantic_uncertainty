@@ -9,6 +9,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import wandb
 
+from energy import get_energy_logits
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--evaluation_model', type=str, default='opt-350m')
 parser.add_argument('--generation_model', type=str, default='opt-350m')
@@ -55,22 +57,6 @@ with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations_s
     similarities_dict = pickle.load(infile)
 
 
-def _get_energy(logits):
-    probs = torch.nn.functional.softmax(logits, dim=-1)
-    probs = probs ** (-2)
-    # sum probs over the sequence
-    probs = probs.sum(dim=1)
-    # calculate the normalizing constant to the power of -2
-    normalizing_constant = torch.exp(logits).sum(dim=1) ** (-2)
-    # sum over the sequence
-    normalizing_constant = normalizing_constant.sum(dim=1)
-    # multiply the probs along the vocab dimension
-    probs_log_factor = torch.logsumexp(probs, dim=1)
-    c_log_factor = torch.log(1 + (probs ** (-1)).sum() * normalizing_constant)
-    energy = probs_log_factor + c_log_factor
-    return energy
-
-
 def get_neg_loglikelihoods(model, sequences):
     with torch.no_grad():
         result = []
@@ -108,7 +94,7 @@ def get_neg_loglikelihoods(model, sequences):
                 average_neg_log_likelihood = model_output['loss']
 
                 average_unconditioned_neg_log_likelihood = unconditioned_model_output['loss']
-                energies[generation_index] = _get_energy(model_output['logits'])
+                energies[generation_index] = get_energy_logits(model_output['logits'])
                 average_neg_log_likelihoods[generation_index] = average_neg_log_likelihood
                 average_unconditioned_neg_log_likelihoods[generation_index] = average_unconditioned_neg_log_likelihood
                 neg_log_likelihoods[generation_index] = average_neg_log_likelihood * (len(generation) - len(prompt))
