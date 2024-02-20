@@ -46,6 +46,7 @@ def get_energy_logits(pre_softmax):
     vocab_size = pre_softmax.shape[2]
     # energies = torch.zeros(pre_softmax.shape[1])
     for i in range(pre_softmax.shape[1]):
+        i = 0
         token_pre_softmax = pre_softmax[:, i, :]
         token_pre_softmax = token_pre_softmax / temp
         probs = torch.softmax(token_pre_softmax, dim=-1)
