@@ -38,6 +38,7 @@ def calculate_energy(X, model, mu=None, sigma=None, batch_size=32, fast=True):
 
 
 def get_energy_logits(pre_softmax):
+    pre_softmax = pre_softmax.to(dtype=torch.float64)
     energy_total = None
     temp = 1
     if len(pre_softmax.shape) == 2:
