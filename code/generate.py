@@ -117,7 +117,7 @@ if __name__ == '__main__':
                 if n_batches > 10:
                     break
                 q = batch['question'][0]
-                inpt = f"Question: {q} Answer: "
+                inpt = f"Question: {q} ? Answer: "
                 input_ids = tokenizer.encode(inpt, return_tensors='pt').to(device)
                 print(input_ids.shape)
                 # input_ids = batch['input_ids'].to(device).reshape(
@@ -150,7 +150,8 @@ if __name__ == '__main__':
                 # print the generation
                 for i in range(generation_no_input.shape[0]):
                     txt = (f"question: {tokenizer.decode(input_ids[0])} \n"
-                           f"generation: {tokenizer.decode(generation_no_input[i])}")
+                           f"generation: {tokenizer.decode(generation_no_input[i])}"
+                           f"generation full: {tokenizer.decode(most_likely_generation[i])}")
                     print(txt)
                 generations = torch.ones((number_of_generations, input_length + max_length_of_generated_sequence),
                                          dtype=torch.long,
