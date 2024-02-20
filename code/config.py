@@ -54,7 +54,7 @@ device_map = {
     'lm_head': 1
 }
 
-data_dir = '/accounts/campus/omer_ronen/projects/semantic_uncertainty/data'
-hf_datasets_cache = '/accounts/campus/omer_ronen/projects/semantic_uncertainty/data'
-output_dir = '/accounts/campus/omer_ronen/projects/semantic_uncertainty/data'
-hf_cache_dir = '/accounts/campus/omer_ronen/projects/semantic_uncertainty/data'
+data_dir = 'data'
+hf_datasets_cache = 'data'
+output_dir = 'data'
+hf_cache_dir = 'data'
