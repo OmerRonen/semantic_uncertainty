@@ -81,6 +81,9 @@ def get_neg_loglikelihoods(model, sequences):
             for generation_index in range(generations.shape[0]):
                 prompt = prompt[prompt != tokenizer.pad_token_id]
                 generation = generations[generation_index][generations[generation_index] != tokenizer.pad_token_id]
+                # remove prompt tokens from generation
+                generation_new = generation[len(prompt) - 1:]
+                print(f"question: {tokenizer.decode(prompt)}, answer: {tokenizer.decode(generation_new)}")
 
                 # This computation of the negative log likelihoods follows this tutorial: https://huggingface.co/docs/transformers/perplexity
                 target_ids = generation.clone()
