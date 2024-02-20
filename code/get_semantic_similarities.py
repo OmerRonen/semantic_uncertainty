@@ -129,9 +129,9 @@ for sample in tqdm(sequences):
         results = rouge.compute(predictions=answer_list_1, references=answer_list_2)
 
         for rouge_type in rouge_types:
-            syntactic_similarities[rouge_type] = results[rouge_type].mid.fmeasure
+            syntactic_similarities[rouge_type] = results[rouge_type]
 
-    result_dict[id_] = {
+    result_dict[id_] =  {
         'syntactic_similarities': syntactic_similarities,
         'has_semantically_different_answers': has_semantically_different_answers
     }
