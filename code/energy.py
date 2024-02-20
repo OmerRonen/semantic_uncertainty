@@ -48,20 +48,16 @@ def get_energy_logits(pre_softmax):
         token_pre_softmax = pre_softmax[:, i, :]
         token_pre_softmax = token_pre_softmax / temp
         probs = torch.softmax(token_pre_softmax, dim=-1)
-        print(probs.min())
 
         log_c = token_pre_softmax.logsumexp(dim=-1)
         one_over_probs = 1 / probs  # torch.clamp(1 / probs, min=1e-10, max=1e10)
         factor_mul_log = 2 * torch.sum(torch.log(one_over_probs))
-        print(factor_mul_log)
         energy = factor_mul_log + torch.log(torch.sum((probs ** 2))) + -2 * log_c
-        print(energy)
 
         if energy_total is None:
             energy_total = energy / vocab_size
         else:
             energy_total += energy / vocab_size
-        print(energy_total)
 
     return energy_total
 
