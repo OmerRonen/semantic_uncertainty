@@ -58,9 +58,9 @@ def get_energy_logits(pre_softmax):
         # energies[i] = energy
 
         if energy_total is None:
-            energy_total = energy / (vocab_size * pre_softmax.shape[1])
+            energy_total = energy / (vocab_size)
         else:
-            energy_total += energy / (vocab_size * pre_softmax.shape[1])
+            energy_total += energy / (vocab_size)
     # print(np.mean(energies))
     return energy_total
 
