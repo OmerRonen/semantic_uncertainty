@@ -116,9 +116,10 @@ if __name__ == '__main__':
                 # print(batch)
                 if n_batches > 10:
                     break
-                print(batch['input_ids'].shape)
-                input_ids = batch['input_ids'].to(device).reshape(
-                    1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
+                inputs_ids = tokenizer.encode(batch['question'], return_tensors='pt')
+                print(inputs_ids.shape)
+                # input_ids = batch['input_ids'].to(device).reshape(
+                #     1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
                 input_ids = input_ids.to(dtype=torch.long)
                 # print the question
                 for i in range(input_ids.shape[0]):
