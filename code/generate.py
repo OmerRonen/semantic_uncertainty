@@ -142,7 +142,7 @@ if __name__ == '__main__':
                                                             bad_words_ids=question_framing_ids)
 
                 input_length = input_ids.shape[1] if args.dataset == 'trivia_qa' else batch['input_ids'].shape[1]
-                generation_no_input = generation[:, input_length:]
+                generation_no_input = most_likely_generation[:, input_length:]
                 # print the generation
                 for i in range(generation_no_input.shape[0]):
                     txt = (f"question: {tokenizer.decode(input_ids[i])} \n"
