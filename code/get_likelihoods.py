@@ -12,8 +12,8 @@ import wandb
 from energy import get_energy_logits
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--evaluation_model', type=str, default='opt-350m')
-parser.add_argument('--generation_model', type=str, default='opt-350m')
+parser.add_argument('--evaluation_model', type=str, default='opt-2.7b')
+parser.add_argument('--generation_model', type=str, default='opt-2.7b')
 parser.add_argument('--run_id', type=str, default='run_1')
 args = parser.parse_args()
 
@@ -83,6 +83,9 @@ def get_neg_loglikelihoods(model, sequences):
                 generation = generations[generation_index][generations[generation_index] != tokenizer.pad_token_id]
                 # remove prompt tokens from generation
                 generation_new = generation[len(prompt) - 1:]
+                # print the generation and the generation_new
+                print(tokenizer.decode(generation))
+                print(tokenizer.decode(generation_new))
 
                 # This computation of the negative log likelihoods follows this tutorial: https://huggingface.co/docs/transformers/perplexity
                 target_ids = generation.clone()
@@ -97,7 +100,9 @@ def get_neg_loglikelihoods(model, sequences):
 
                 average_unconditioned_neg_log_likelihood = unconditioned_model_output['loss']
                 # print(model_output['logits'].shape)
-                energies[generation_index] = get_energy_logits(model_output['logits'])
+                logits = model_output['logits']
+                logits_new = logits[0, len(prompt) - 1:]
+                energies[generation_index] = get_energy_logits(logits_new)
                 average_neg_log_likelihoods[generation_index] = average_neg_log_likelihood
                 average_unconditioned_neg_log_likelihoods[generation_index] = average_unconditioned_neg_log_likelihood
                 neg_log_likelihoods[generation_index] = average_neg_log_likelihood * (len(generation) - len(prompt))
