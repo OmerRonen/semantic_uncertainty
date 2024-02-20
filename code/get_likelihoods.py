@@ -30,7 +30,7 @@ random.seed(seed_value)
 
 np.random.seed(seed_value)
 
-#Fix torch random seed
+# Fix torch random seed
 torch.manual_seed(seed_value)
 
 os.environ["HF_DATASETS_CACHE"] = config.hf_datasets_cache
@@ -55,8 +55,23 @@ with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations_s
     similarities_dict = pickle.load(infile)
 
 
-def get_neg_loglikelihoods(model, sequences):
+def _get_energy(logits):
+    probs = torch.nn.functional.softmax(logits, dim=-1)
+    probs = probs ** (-2)
+    # sum probs over the sequence
+    probs = probs.sum(dim=1)
+    # calculate the normalizing constant to the power of -2
+    normalizing_constant = torch.exp(logits).sum(dim=1) ** (-2)
+    # sum over the sequence
+    normalizing_constant = normalizing_constant.sum(dim=1)
+    # multiply the probs along the vocab dimension
+    probs_log_factor = torch.logsumexp(probs, dim=1)
+    c_log_factor = torch.log(1 + (probs ** (-1)).sum() * normalizing_constant)
+    energy = probs_log_factor + c_log_factor
+    return energy
 
+
+def get_neg_loglikelihoods(model, sequences):
     with torch.no_grad():
         result = []
         for sample in sequences:
@@ -71,6 +86,8 @@ def get_neg_loglikelihoods(model, sequences):
             average_neg_log_likelihoods = torch.zeros((generations.shape[0],))
             average_unconditioned_neg_log_likelihoods = torch.zeros((generations.shape[0],))
             neg_log_likelihoods = torch.zeros((generations.shape[0],))
+            energies = torch.zeros((generations.shape[0],))
+
             neg_unconditioned_log_likelihoods = torch.zeros((generations.shape[0],))
             pointwise_mutual_information = torch.zeros((generations.shape[0],))
             sequence_embeddings = []
@@ -91,11 +108,12 @@ def get_neg_loglikelihoods(model, sequences):
                 average_neg_log_likelihood = model_output['loss']
 
                 average_unconditioned_neg_log_likelihood = unconditioned_model_output['loss']
+                energies[generation_index] = _get_energy(model_output['logits'])
                 average_neg_log_likelihoods[generation_index] = average_neg_log_likelihood
                 average_unconditioned_neg_log_likelihoods[generation_index] = average_unconditioned_neg_log_likelihood
                 neg_log_likelihoods[generation_index] = average_neg_log_likelihood * (len(generation) - len(prompt))
                 neg_unconditioned_log_likelihoods[generation_index] = average_unconditioned_neg_log_likelihood * (
-                    len(generation) - len(prompt))
+                        len(generation) - len(prompt))
                 pointwise_mutual_information[generation_index] = -neg_log_likelihoods[
                     generation_index] + neg_unconditioned_log_likelihoods[generation_index]
 
@@ -123,12 +141,13 @@ def get_neg_loglikelihoods(model, sequences):
             second_most_likely_generation_embedding = torch.mean(hidden_states[-1], dim=1)
 
             neg_log_likelihood_of_most_likely_gen = average_neg_log_likelihood_of_most_likely_gen * (
-                len(most_likely_generation) - len(prompt))
+                    len(most_likely_generation) - len(prompt))
 
             sequence_embeddings = torch.stack(sequence_embeddings)
             result_dict['prompt'] = prompt
             result_dict['generations'] = generations
             result_dict['average_neg_log_likelihoods'] = average_neg_log_likelihoods
+            result_dict['energies'] = energies
             result_dict['neg_log_likelihoods'] = neg_log_likelihoods
             result_dict['sequence_embeddings'] = most_likely_generation_embedding
             result_dict['most_likely_sequence_embedding'] = most_likely_generation

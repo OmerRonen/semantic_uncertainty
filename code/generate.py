@@ -90,7 +90,7 @@ if args.dataset == 'coqa':
 elif args.dataset == 'trivia_qa':
     questions = train_dataset
 
-dataloader = torch.utils.data.DataLoader(questions, batch_size=1)
+dataloader = torch.utils.data.DataLoader(questions[0:100], batch_size=1)
 
 period_token_id = tokenizer('. ')['input_ids'][1]
 eos_tokens = ['Question:', ' Question:', '\n', 'Answer:', ' Answer:', 'Q:']
@@ -107,7 +107,7 @@ def get_generations(model, dataloader, number_of_generations):
         max_length_of_generated_sequence = 256
         sequences = []
         for batch in tqdm.tqdm(dataloader):
-            print(batch)
+            # print(batch)
 
             input_ids = torch.cat([batch['input_ids']]).to(device).reshape(
                 1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
