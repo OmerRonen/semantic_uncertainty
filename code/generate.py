@@ -53,7 +53,7 @@ os.environ["HF_DATASETS_CACHE"] = config.hf_datasets_cache
 
 model = AutoModelForCausalLM.from_pretrained(f"facebook/{args.model}",
                                              torch_dtype=torch.float16,
-                                             cache_dir=config.hf_cache_dir).cuda()
+                                             cache_dir=config.hf_cache_dir).to(device=device)
 
 if args.model == 'opt-30b':
     accelerate.dispatch_model(model, device_map=config.device_map)
