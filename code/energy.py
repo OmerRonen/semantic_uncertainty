@@ -55,7 +55,7 @@ def get_energy_logits(pre_softmax):
         factor_mul_log = 2 * torch.sum(torch.log(one_over_probs))
         c_term = torch.exp(-2 * log_c)
         energy = factor_mul_log + torch.log(1 + torch.sum((probs ** 2)) * c_term)
-        energies.append(energy / vocab_size)
+        energies.append(energy.detach().cpu().numpy() / vocab_size)
 
         if energy_total is None:
             energy_total = energy / vocab_size
