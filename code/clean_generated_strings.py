@@ -16,7 +16,7 @@ parser.add_argument('--generation_model', type=str, default='opt-350m')
 parser.add_argument('--run_id', type=str, default='run_1')
 args = parser.parse_args()
 
-device = 'cuda'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Set a seed value
 seed_value = 10
