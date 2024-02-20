@@ -135,7 +135,8 @@ if __name__ == '__main__':
                                                             max_length=input_ids.shape[1] +
                                                                        max_length_of_generated_sequence,
                                                             eos_token_id=period_token_id,
-                                                            bad_words_ids=question_framing_ids)
+                                                            # bad_words_ids=question_framing_ids
+                                                            )
                 elif args.decoding_method == 'greedy':
                     most_likely_generation = model.generate(input_ids,
                                                             num_beams=1,
@@ -149,8 +150,8 @@ if __name__ == '__main__':
                 generation_no_input = most_likely_generation[:, input_length:]
                 # print the generation
                 for i in range(generation_no_input.shape[0]):
-                    txt = (f"question: {tokenizer.decode(input_ids[0])} \n"
-                           f"generation: {tokenizer.decode(generation_no_input[i])}"
+                    txt = (f"question: {tokenizer.decode(input_ids[0])}\n"
+                           f"generation: {tokenizer.decode(generation_no_input[i])}\n"
                            f"generation full: {tokenizer.decode(most_likely_generation[i])}")
                     print(txt)
                 generations = torch.ones((number_of_generations, input_length + max_length_of_generated_sequence),
