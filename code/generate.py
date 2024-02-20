@@ -117,7 +117,7 @@ if __name__ == '__main__':
                 if n_batches > 10:
                     break
                 q = batch['question'][0]
-                inpt = f"This is a bot that correctly answers questions. \n Question: {q}? Your answer:"
+                inpt = f"This is a bot that correctly answers questions. \n Question: {q} Answer:"
                 input_ids = tokenizer.encode(inpt, return_tensors='pt').to(device)
                 print(input_ids.shape)
                 # input_ids = batch['input_ids'].to(device).reshape(
@@ -150,9 +150,7 @@ if __name__ == '__main__':
                 generation_no_input = most_likely_generation[:, input_length:]
                 # print the generation
                 for i in range(generation_no_input.shape[0]):
-                    txt = (f"question: {tokenizer.decode(input_ids[0])}\n"
-                           f"generation: {tokenizer.decode(generation_no_input[i])}\n"
-                           f"generation full: {tokenizer.decode(most_likely_generation[i])}")
+                    txt = f"generation full: {tokenizer.decode(most_likely_generation[i])}"
                     print(txt)
                 generations = torch.ones((number_of_generations, input_length + max_length_of_generated_sequence),
                                          dtype=torch.long,
@@ -171,6 +169,7 @@ if __name__ == '__main__':
 
                 generations = torch.reshape(generations, (-1, number_of_generations, generations.shape[-1]))
                 for i in range(generations.shape[0]):
+                    generation_no_input = generations[i, :, input_length:]
 
                     if args.dataset == 'coqa':
                         sequence_dict = {
@@ -187,7 +186,9 @@ if __name__ == '__main__':
                             'generations': generations[i],
                             'id': batch['question_id'],
                             'few_shot_question': tokenizer.decode(input_ids[0]),
-                            'question': question
+                            'question': question,
+                            "answer": generation_no_input,
+                            "true_answer": batch['answer']
                         }
 
                     generated_texts = []
