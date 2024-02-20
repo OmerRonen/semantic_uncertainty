@@ -148,9 +148,11 @@ if __name__ == '__main__':
 
                 input_length = input_ids.shape[1] if args.dataset == 'trivia_qa' else batch['input_ids'].shape[1]
                 generation_no_input = most_likely_generation[:, input_length:]
+                answers_most_likely = []
                 # print the generation
                 for i in range(generation_no_input.shape[0]):
                     txt = f"generation full: {tokenizer.decode(most_likely_generation[i])}"
+                    answers_most_likely.append(tokenizer.decode(generation_no_input[i]))
                     print(txt)
                 generations = torch.ones((number_of_generations, input_length + max_length_of_generated_sequence),
                                          dtype=torch.long,
@@ -198,12 +200,14 @@ if __name__ == '__main__':
 
                     sequence_dict['generated_texts'] = generated_texts
                     sequence_dict['most_likely_generation_ids'] = most_likely_generation[0].to('cpu')
-                    sequence_dict['most_likely_generation'] = tokenizer.decode(
-                        most_likely_generation[0][len(batch['input_ids'][i]):], skip_special_tokens=True)
+                    # sequence_dict['most_likely_generation'] = tokenizer.decode(
+                    #     most_likely_generation[0][len(batch['input_ids'][i]):], skip_special_tokens=True)
+                    sequence_dict['most_likely_generation'] = answers_most_likely[0]
 
                     sequence_dict['second_most_likely_generation_ids'] = most_likely_generation[1].to('cpu')
-                    sequence_dict['second_most_likely_generation'] = tokenizer.decode(
-                        most_likely_generation[1][len(batch['input_ids'][i]):], skip_special_tokens=True)
+                    # sequence_dict['second_most_likely_generation'] = tokenizer.decode(
+                    #     most_likely_generation[1][len(batch['input_ids'][i]):], skip_special_tokens=True)
+                    sequence_dict['second_most_likely_generation'] = answers_most_likely[1]
 
                     sequence_dict['semantic_variability_reference_answers'] = batch[
                         'semantic_variability'] if 'semantic_variability' in batch else None
