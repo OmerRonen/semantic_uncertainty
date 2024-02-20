@@ -40,6 +40,8 @@ def calculate_energy(X, model, mu=None, sigma=None, batch_size=32, fast=True):
 def get_energy_logits(pre_softmax):
     energy_total = None
     temp = 1
+    if len(pre_softmax.shape) == 2:
+        pre_softmax = pre_softmax.unsqueeze(0)
     vocab_size = pre_softmax.shape[2]
     for i in range(pre_softmax.shape[1]):
         token_pre_softmax = pre_softmax[:, i, :]
