@@ -212,7 +212,7 @@ def get_generations(model, dataloader, number_of_generations):
                     sequence_dict['exact_match'] = max(results['exact_match'], sequence_dict['exact_match'])
                     rouge_results = rouge.compute(predictions=predictions, references=references)
                     for rouge_type in rouge_types:
-                        sequence_dict[rouge_type + '_to_target'] = max(rouge_results[rouge_type].mid.fmeasure,
+                        sequence_dict[rouge_type + '_to_target'] = max(rouge_results[rouge_type],
                                                                        sequence_dict[rouge_type + '_to_target'])
 
                 sequences.append(sequence_dict)
