@@ -109,7 +109,7 @@ if __name__ == '__main__':
         """For a given model, produce a number of generation """
 
         with torch.no_grad():
-            max_length_of_generated_sequence = 256
+            max_length_of_generated_sequence = 10
             sequences = []
             n_batches = 0
             for batch in tqdm.tqdm(dataloader):
