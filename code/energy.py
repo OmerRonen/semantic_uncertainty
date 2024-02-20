@@ -44,7 +44,7 @@ def get_energy_logits(pre_softmax):
     if len(pre_softmax.shape) == 2:
         pre_softmax = pre_softmax.unsqueeze(0)
     vocab_size = pre_softmax.shape[2]
-    energies = []
+    energies = torch.zeros(pre_softmax.shape[1])
     for i in range(pre_softmax.shape[1]):
         token_pre_softmax = pre_softmax[:, i, :]
         token_pre_softmax = token_pre_softmax / temp
@@ -55,14 +55,14 @@ def get_energy_logits(pre_softmax):
         factor_mul_log = 2 * torch.sum(torch.log(one_over_probs))
         c_term = torch.exp(-2 * log_c)
         energy = factor_mul_log + torch.log(1 + torch.sum((probs ** 2)) * c_term)
-        energies.append(energy.detach().cpu().numpy()[0]/ vocab_size)
+        energies[i] = energy
 
-        if energy_total is None:
-            energy_total = energy / vocab_size
-        else:
-            energy_total += energy / vocab_size
-    print(np.mean(energies))
-    return energy_total
+        # if energy_total is None:
+        #     energy_total = energy / vocab_size
+        # else:
+        #     energy_total += energy / vocab_size
+    # print(np.mean(energies))
+    return torch.mean(energies)
 
 
 def get_probs(net, X, pre_softmax=None, derivative=False, fast=False):
