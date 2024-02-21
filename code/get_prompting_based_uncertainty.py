@@ -46,7 +46,7 @@ args = parser.parse_args()
 wandb.init(project='nlg_uncertainty', id=args.run_id_for_few_shot_prompt, config=args, resume='allow')
 model_name = wandb.config.model
 
-generation_tokenizer = AutoTokenizer.from_pretrained(f"facebook/opt-350m", use_fast=False, cache_dir=config.data_dir)
+generation_tokenizer = AutoTokenizer.from_pretrained(f"facebook/{model_name}", use_fast=False, cache_dir=config.data_dir)
 model = AutoModelForCausalLM.from_pretrained(f"facebook/{model_name}",
                                              torch_dtype=torch.float16,
                                              cache_dir=config.data_dir).cuda()
