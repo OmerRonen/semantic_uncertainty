@@ -207,6 +207,7 @@ if __name__ == '__main__':
 
     overall_results['mutual_information'] = mutual_information
     overall_results['predictive_entropy'] = predictive_entropy
+    overall_results['energy'] = energy
     overall_results['predictive_entropy_over_concepts'] = predictive_entropy_over_concepts
     overall_results['unnormalised_entropy_over_concepts'] = unnormalised_entropy_over_concepts
     overall_results['number_of_semantic_sets'] = number_of_semantic_sets
