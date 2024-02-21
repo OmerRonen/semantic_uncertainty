@@ -38,7 +38,7 @@ torch.manual_seed(seed_value)
 os.environ["HF_DATASETS_CACHE"] = config.hf_datasets_cache
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--generation_model', type=str, default='opt-1.3b')
+parser.add_argument('--generation_model', type=str, default='opt-2.7b')
 parser.add_argument('--run_id_for_few_shot_prompt', type=str, default='run_1')
 parser.add_argument('--run_id_for_evaluation', type=str, default='run_1')
 args = parser.parse_args()
