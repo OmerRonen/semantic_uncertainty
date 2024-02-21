@@ -13,7 +13,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import config
 import wandb
 
-from code.utils import to_cpu
+from utils import to_cpu
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--generation_model', type=str, default='opt-2.7b')

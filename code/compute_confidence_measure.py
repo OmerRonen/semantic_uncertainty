@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import wandb
 
-from code.utils import to_cpu
+from utils import to_cpu
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--generation_model', type=str, default='opt-2.7b')

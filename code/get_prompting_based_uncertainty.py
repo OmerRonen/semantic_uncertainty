@@ -17,7 +17,7 @@ import config
 #sns.color_palette("pastel")
 import wandb
 
-from code.utils import to_cpu
+from utils import to_cpu
 from config import device_map
 
 # Set a seed value

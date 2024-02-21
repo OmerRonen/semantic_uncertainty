@@ -14,7 +14,7 @@ import tqdm
 import wandb
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from code.utils import to_cpu
+from utils import to_cpu
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--type_of_question', type=str)

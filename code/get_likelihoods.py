@@ -9,7 +9,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import wandb
 
-from code.utils import to_cpu
+from utils import to_cpu
 from energy import get_energy_logits
 
 parser = argparse.ArgumentParser()
