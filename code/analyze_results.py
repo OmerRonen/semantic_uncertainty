@@ -156,7 +156,11 @@ if __name__ == '__main__':
                                                                             result_df['rougeL_among_generations'])
 
         result_dict['average_energy_auroc'] = roc_auc_score(1 - result_df['correct'], result_df['energies'])
-
+        result_dict["average_energy_first_token_auroc"] = roc_auc_score(1 - result_df['correct'],
+                                                                                   result_df['energies_first_token'])
+        result_dict["average_energy_average_over_sequence_auroc"] = roc_auc_score(1 - result_df['correct'],
+                                                                                         result_df[
+                                                                                             'energies_average_over_sequence'])
         average_neg_llh_most_likely_gen_auroc = roc_auc_score(
             1 - result_df['correct'], result_df['average_neg_log_likelihood_of_most_likely_gen'])
         result_dict['average_neg_llh_most_likely_gen_auroc'] = average_neg_llh_most_likely_gen_auroc
@@ -182,6 +186,8 @@ if __name__ == '__main__':
                   roc_auc_score(result_df['correct'], result_df['rougeL_among_generations']))
             # print('margin measure auroc:', result_dict['margin_measure_auroc'])
             print('average_energy_auroc:', result_dict['average_energy_auroc'])
+            print('average_energy_first_token_auroc:', result_dict['average_energy_first_token_auroc'])
+            print('average_energy_average_over_sequence_auroc:', result_dict['average_energy_average_over_sequence_auroc'])
 
         # Measure the AURROCs when using different numbers of generations to compute our uncertainty measures.
         ln_aurocs = []
