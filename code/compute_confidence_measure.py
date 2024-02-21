@@ -9,8 +9,8 @@ import torch
 import wandb
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--generation_model', type=str, default='opt-350m')
-parser.add_argument('--evaluation_model', type=str, default='opt-350m')
+parser.add_argument('--generation_model', type=str, default='opt-2.7b')
+parser.add_argument('--evaluation_model', type=str, default='opt-2.7b')
 parser.add_argument('--run_id', type=str, default='run_1')
 parser.add_argument('--verbose', type=bool, default=True)
 args = parser.parse_args()
