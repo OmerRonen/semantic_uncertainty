@@ -7,12 +7,13 @@ import config
 import numpy as np
 import pandas as pd
 import sklearn
-import sklearn.metrics
+from sklearn.metrics import roc_auc_score
 import torch
 import wandb
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-n', '--run_ids', nargs='+', default=[])
+parser.add_argument('--generating_model', type=str, default='opt-2.7b')
 parser.add_argument('--verbose', type=bool, default=True)
 args = parser.parse_args()
 
@@ -27,7 +28,7 @@ for run_id in run_ids_to_analyze:
 
     wandb.init(project='nlg_uncertainty', id=run_id, resume='allow')
     run_name = wandb.run.name
-    model_name = wandb.config.model
+    model_name = args.generating_model
     print(run_name)
 
     def get_similarities_df():
@@ -112,29 +113,29 @@ for run_id in run_ids_to_analyze:
     result_dict['accuracy'] = result_df['correct'].mean()
 
     # Compute the auroc for the length normalized predictive entropy
-    ln_predictive_entropy_auroc = sklearn.metrics.roc_auc_score(1 - result_df['correct'],
+    ln_predictive_entropy_auroc = roc_auc_score(1 - result_df['correct'],
                                                                 result_df['average_predictive_entropy'])
     result_dict['ln_predictive_entropy_auroc'] = ln_predictive_entropy_auroc
 
-    predictive_entropy_auroc = sklearn.metrics.roc_auc_score(1 - result_df['correct'], result_df['predictive_entropy'])
+    predictive_entropy_auroc = roc_auc_score(1 - result_df['correct'], result_df['predictive_entropy'])
     result_dict['predictive_entropy_auroc'] = predictive_entropy_auroc
 
-    entropy_over_concepts_auroc = sklearn.metrics.roc_auc_score(1 - result_df['correct'],
+    entropy_over_concepts_auroc = roc_auc_score(1 - result_df['correct'],
                                                                 result_df['predictive_entropy_over_concepts'])
     result_dict['entropy_over_concepts_auroc'] = entropy_over_concepts_auroc
 
     if 'unnormalised_entropy_over_concepts' in result_df.columns:
-        unnormalised_entropy_over_concepts_auroc = sklearn.metrics.roc_auc_score(
+        unnormalised_entropy_over_concepts_auroc = roc_auc_score(
             1 - result_df['correct'], result_df['unnormalised_entropy_over_concepts'])
         result_dict['unnormalised_entropy_over_concepts_auroc'] = unnormalised_entropy_over_concepts_auroc
 
     aurocs_across_models.append(entropy_over_concepts_auroc)
 
-    neg_llh_most_likely_gen_auroc = sklearn.metrics.roc_auc_score(1 - result_df['correct'],
+    neg_llh_most_likely_gen_auroc = roc_auc_score(1 - result_df['correct'],
                                                                   result_df['neg_log_likelihood_of_most_likely_gen'])
     result_dict['neg_llh_most_likely_gen_auroc'] = neg_llh_most_likely_gen_auroc
 
-    number_of_semantic_sets_auroc = sklearn.metrics.roc_auc_score(1 - result_df['correct'],
+    number_of_semantic_sets_auroc = roc_auc_score(1 - result_df['correct'],
                                                                   result_df['number_of_semantic_sets'])
     result_dict['number_of_semantic_sets_auroc'] = number_of_semantic_sets_auroc
 
@@ -148,15 +149,15 @@ for run_id in run_ids_to_analyze:
                                                                         1]['rougeL_among_generations'].mean()
     result_dict['average_rougeL_among_generations_incorrect'] = result_df[result_df['correct'] ==
                                                                           0]['rougeL_among_generations'].mean()
-    result_dict['average_rougeL_auroc'] = sklearn.metrics.roc_auc_score(result_df['correct'],
+    result_dict['average_rougeL_auroc'] = roc_auc_score(result_df['correct'],
                                                                         result_df['rougeL_among_generations'])
 
-    average_neg_llh_most_likely_gen_auroc = sklearn.metrics.roc_auc_score(
+    average_neg_llh_most_likely_gen_auroc = roc_auc_score(
         1 - result_df['correct'], result_df['average_neg_log_likelihood_of_most_likely_gen'])
     result_dict['average_neg_llh_most_likely_gen_auroc'] = average_neg_llh_most_likely_gen_auroc
     result_dict['rougeL_based_accuracy'] = result_df['correct'].mean()
 
-    result_dict['margin_measure_auroc'] = sklearn.metrics.roc_auc_score(
+    result_dict['margin_measure_auroc'] = roc_auc_score(
         1 - result_df['correct'], result_df['average_neg_log_likelihood_of_most_likely_gen'] +
         result_df['average_neg_log_likelihood_of_second_most_likely_gen'])
 
@@ -169,11 +170,11 @@ for run_id in run_ids_to_analyze:
         print('semantci entropy auroc', entropy_over_concepts_auroc)
         print(
             'Semantic entropy +',
-            sklearn.metrics.roc_auc_score(
+            roc_auc_score(
                 1 - result_df['correct'],
                 result_df['predictive_entropy_over_concepts'] - 3 * result_df['rougeL_among_generations']))
         print('RougeL among generations auroc',
-              sklearn.metrics.roc_auc_score(result_df['correct'], result_df['rougeL_among_generations']))
+              roc_auc_score(result_df['correct'], result_df['rougeL_among_generations']))
         print('margin measure auroc:', result_dict['margin_measure_auroc'])
 
     # Measure the AURROCs when using different numbers of generations to compute our uncertainty measures.
@@ -184,14 +185,14 @@ for run_id in run_ids_to_analyze:
     average_number_of_semantic_sets_correct = []
     average_number_of_semantic_sets_incorrect = []
     for i in range(1, num_generations + 1):
-        ln_predictive_entropy_auroc = sklearn.metrics.roc_auc_score(
+        ln_predictive_entropy_auroc = roc_auc_score(
             1 - result_df['correct'], result_df['average_predictive_entropy_on_subset_{}'.format(i)])
         aurocs.append(
-            sklearn.metrics.roc_auc_score(1 - result_df['correct'],
+            roc_auc_score(1 - result_df['correct'],
                                           result_df['predictive_entropy_on_subset_{}'.format(i)]))
         ln_aurocs.append(ln_predictive_entropy_auroc)
         semantic_aurocs.append(
-            sklearn.metrics.roc_auc_score(1 - result_df['correct'],
+            roc_auc_score(1 - result_df['correct'],
                                           result_df['semantic_predictive_entropy_on_subset_{}'.format(i)]))
         average_number_of_semantic_sets.append(result_df['number_of_semantic_sets_on_subset_{}'.format(i)].mean())
         average_number_of_semantic_sets_correct.append(
