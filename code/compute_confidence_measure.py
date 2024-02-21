@@ -232,6 +232,7 @@ if __name__ == '__main__':
         print('predicitve entropy shape: ', predictive_entropy.shape)
         print('predicitve entropy per concept shape: ', predictive_entropy_over_concepts.shape)
         print(overall_results['average_neg_log_likelihoods'].shape)
+        print(f"energy shape: {energy.shape}")
         print(len(number_of_semantic_sets_on_subsets))
         print(number_of_semantic_sets_on_subsets[0].shape)
         print('average predictive entropy on subsets: ', len(average_predictive_entropy_on_subsets))
