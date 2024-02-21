@@ -194,7 +194,7 @@ if __name__ == '__main__':
 
                     generated_texts = []
                     for generation in generations[i]:
-                        txt_i = f"generation: {tokenizer.decode(generation)}"
+                        txt_i = f"generation: {tokenizer.decode(generation[input_length:])}"
                         print(txt_i)
                         generated_texts.append(
                             tokenizer.decode(generation[len(batch['input_ids'][i]):], skip_special_tokens=True))
