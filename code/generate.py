@@ -118,14 +118,14 @@ if __name__ == '__main__':
                 q = batch['question'][0]
                 inpt = f"This is a bot that correctly answers questions. \n Question: {q} Answer:"
                 input_ids = tokenizer.encode(inpt, return_tensors='pt').to(device)
-                print(input_ids.shape)
+                # print(input_ids.shape)
                 # input_ids = batch['input_ids'].to(device).reshape(
                 #     1, -1) if args.dataset == 'trivia_qa' else batch['input_ids'].to(device)
                 input_ids = input_ids.to(dtype=torch.long)
                 # print the question
                 for i in range(input_ids.shape[0]):
                     ques = tokenizer.decode(input_ids[i])
-                    print("q: ", ques)
+                    # print("q: ", ques)
                 if args.decoding_method == 'beam_search':
                     most_likely_generation = model.generate(input_ids,
                                                             num_beams=5,
@@ -152,7 +152,7 @@ if __name__ == '__main__':
                 for i in range(generation_no_input.shape[0]):
                     txt = f"generation full: {tokenizer.decode(most_likely_generation[i])}"
                     answers_most_likely.append(tokenizer.decode(generation_no_input[i], skip_special_tokens=True))
-                    print(txt)
+                    # print(txt)
                 generations = torch.ones((number_of_generations, input_length + max_length_of_generated_sequence),
                                          dtype=torch.long,
                                          device=device)
@@ -234,7 +234,7 @@ if __name__ == '__main__':
                     for answer in reference_answers:
                         predictions = [sequence_dict['most_likely_generation'].lstrip()]
                         references = [answer]
-                        print(f"predictions: {predictions}\nreferences: {references}")
+                        # print(f"predictions: {predictions}\nreferences: {references}")
                         results = exact_match_metric.compute(predictions=predictions,
                                                              references=references,
                                                              ignore_case=True,
