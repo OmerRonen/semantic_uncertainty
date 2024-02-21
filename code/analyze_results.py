@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
                 keys_to_use = ('ids', 'predictive_entropy', 'mutual_information', 'average_predictive_entropy',\
                                 'average_pointwise_mutual_information', 'average_neg_log_likelihood_of_most_likely_gen',\
-                                'energies', 'neg_log_likelihood_of_most_likely_gen',\
+                                'energies',"energies_first_token",  "energies_average_over_sequence", 'neg_log_likelihood_of_most_likely_gen',\
                                 'predictive_entropy_over_concepts', 'number_of_semantic_sets', 'unnormalised_entropy_over_concepts')
 
                 likelihoods_small = dict((k, likelihoods[k]) for k in keys_to_use + tuple(subset_keys))
@@ -96,6 +96,8 @@ if __name__ == '__main__':
 
                 sequence_embeddings = likelihoods['sequence_embeddings']
                 likelihoods_small["energies"] = likelihoods_small['energies'].mean(dim=1)
+                likelihoods_small["energies_first_token"] = likelihoods_small['energies_first_token'].mean(dim=1)
+                likelihoods_small["energies_average_over_sequence"] = likelihoods_small['energies_average_over_sequence'].mean(dim=1)
                 likelihoods_df = pd.DataFrame.from_dict(likelihoods_small)
 
                 likelihoods_df.rename(columns={'ids': 'id'}, inplace=True)
