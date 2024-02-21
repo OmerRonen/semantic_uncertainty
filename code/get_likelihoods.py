@@ -9,6 +9,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import wandb
 
+from code.utils import to_cpu
 from energy import get_energy_logits
 
 parser = argparse.ArgumentParser()
@@ -163,4 +164,4 @@ likelihoods = get_neg_loglikelihoods(model, sequences)
 
 with open(f'{config.data_dir}/{run_name}/{args.generation_model}_generations_{args.evaluation_model}_likelihoods.pkl',
           'wb') as outfile:
-    pickle.dump(likelihoods, outfile)
+    pickle.dump(to_cpu(likelihoods), outfile)

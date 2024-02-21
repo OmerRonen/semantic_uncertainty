@@ -14,6 +14,8 @@ import tqdm
 import wandb
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from code.utils import to_cpu
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--type_of_question', type=str)
 parser.add_argument('--num_generations_per_prompt', type=int, default=5)
@@ -252,4 +254,4 @@ if __name__ == '__main__':
     pathlib.Path(f'{config.output_dir}/' + run_name).mkdir(parents=True, exist_ok=True)
 
     with open(f'{config.output_dir}/{run_name}/{args.model}_generations.pkl', 'wb') as outfile:
-        pickle.dump(sequences, outfile)
+        pickle.dump(to_cpu(sequences), outfile)

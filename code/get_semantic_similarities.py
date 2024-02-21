@@ -13,6 +13,8 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import config
 import wandb
 
+from code.utils import to_cpu
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--generation_model', type=str, default='opt-2.7b')
 parser.add_argument('--run_id', type=str, default='run_1')
@@ -148,4 +150,4 @@ if __name__ == '__main__':
     print(result_dict)
 
     with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations_similarities.pkl', 'wb') as outfile:
-        pickle.dump(result_dict, outfile)
+        pickle.dump(to_cpu(result_dict), outfile)

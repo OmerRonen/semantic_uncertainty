@@ -8,6 +8,8 @@ import numpy as np
 import torch
 import wandb
 
+from code.utils import to_cpu
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--generation_model', type=str, default='opt-2.7b')
 parser.add_argument('--evaluation_model', type=str, default='opt-2.7b')
@@ -220,7 +222,7 @@ overall_results['average_pointwise_mutual_information'] = average_pointwise_mutu
 
 with open(f'{config.output_dir}/{run_name}/aggregated_likelihoods_{args.generation_model}_generations.pkl',
           'wb') as outfile:
-    pickle.dump(overall_results, outfile)
+    pickle.dump(to_cpu(overall_results), outfile)
 
 if args.verbose:
     print('Margin measure', margin_measures)

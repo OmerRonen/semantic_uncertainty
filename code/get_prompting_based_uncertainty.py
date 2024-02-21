@@ -16,6 +16,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import config
 #sns.color_palette("pastel")
 import wandb
+
+from code.utils import to_cpu
 from config import device_map
 
 # Set a seed value
@@ -125,4 +127,4 @@ with torch.no_grad():
 
     # Store p_true aurocs in a pickle file
     with open(f'{config.output_dir}/{run_name}/{model_name}_p_true_aurocs.pkl', 'wb') as outfile:
-        pickle.dump(p_true_auroc, outfile)
+        pickle.dump(to_cpu(p_true_auroc), outfile)
