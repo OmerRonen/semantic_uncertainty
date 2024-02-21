@@ -157,82 +157,83 @@ def get_margin_probability_uncertainty_measure(log_likelihoods):
 
     return margin_probabilities
 
+if __name__ == '__main__':
 
-list_of_results = []
+    list_of_results = []
 
-with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations_{args.evaluation_model}_likelihoods.pkl',
-          'rb') as infile:
-    sequences = pickle.load(infile)
-    list_of_results.append((args.evaluation_model, sequences))
+    with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations_{args.evaluation_model}_likelihoods.pkl',
+              'rb') as infile:
+        sequences = pickle.load(infile)
+        list_of_results.append((args.evaluation_model, sequences))
 
-overall_results = get_overall_log_likelihoods(list_of_results)
-mutual_information = get_mutual_information(-overall_results['neg_log_likelihoods'])
-predictive_entropy = get_predictive_entropy(-overall_results['neg_log_likelihoods'])
-energy = get_energy_mean(overall_results['energies'])
-predictive_entropy_over_concepts = get_predictive_entropy_over_concepts(-overall_results['average_neg_log_likelihoods'],
-                                                                        overall_results['semantic_set_ids'])
-unnormalised_entropy_over_concepts = get_predictive_entropy_over_concepts(-overall_results['neg_log_likelihoods'],
-                                                                          overall_results['semantic_set_ids'])
+    overall_results = get_overall_log_likelihoods(list_of_results)
+    mutual_information = get_mutual_information(-overall_results['neg_log_likelihoods'])
+    predictive_entropy = get_predictive_entropy(-overall_results['neg_log_likelihoods'])
+    energy = get_energy_mean(overall_results['energies'])
+    predictive_entropy_over_concepts = get_predictive_entropy_over_concepts(-overall_results['average_neg_log_likelihoods'],
+                                                                            overall_results['semantic_set_ids'])
+    unnormalised_entropy_over_concepts = get_predictive_entropy_over_concepts(-overall_results['neg_log_likelihoods'],
+                                                                              overall_results['semantic_set_ids'])
 
-margin_measures = get_margin_probability_uncertainty_measure(-overall_results['average_neg_log_likelihoods'])
-unnormalised_margin_measures = get_margin_probability_uncertainty_measure(-overall_results['neg_log_likelihoods'])
-
-
-def get_number_of_unique_elements_per_row(tensor):
-    assert len(tensor.shape) == 2
-    return torch.count_nonzero(torch.sum(torch.nn.functional.one_hot(tensor), dim=1), dim=1)
+    margin_measures = get_margin_probability_uncertainty_measure(-overall_results['average_neg_log_likelihoods'])
+    unnormalised_margin_measures = get_margin_probability_uncertainty_measure(-overall_results['neg_log_likelihoods'])
 
 
-number_of_semantic_sets = get_number_of_unique_elements_per_row(overall_results['semantic_set_ids'][0])
-average_predictive_entropy = get_predictive_entropy(-overall_results['average_neg_log_likelihoods'])
-average_predictive_entropy_on_subsets = []
-predictive_entropy_on_subsets = []
-semantic_predictive_entropy_on_subsets = []
-num_predictions = overall_results['average_neg_log_likelihoods'].shape[-1]
-number_of_semantic_sets_on_subsets = []
-for i in range(1, num_predictions + 1):
-    offset = num_predictions * (i / 100)
-    average_predictive_entropy_on_subsets.append(
-        get_predictive_entropy(-overall_results['average_neg_log_likelihoods'][:, :, :int(i)]))
-    predictive_entropy_on_subsets.append(get_predictive_entropy(-overall_results['neg_log_likelihoods'][:, :, :int(i)]))
-    semantic_predictive_entropy_on_subsets.append(
-        get_predictive_entropy_over_concepts(-overall_results['average_neg_log_likelihoods'][:, :, :int(i)],
-                                             overall_results['semantic_set_ids'][:, :, :int(i)]))
-    number_of_semantic_sets_on_subsets.append(
-        get_number_of_unique_elements_per_row(overall_results['semantic_set_ids'][0][:, :i]))
+    def get_number_of_unique_elements_per_row(tensor):
+        assert len(tensor.shape) == 2
+        return torch.count_nonzero(torch.sum(torch.nn.functional.one_hot(tensor), dim=1), dim=1)
 
-average_pointwise_mutual_information = get_mean_of_poinwise_mutual_information(
-    overall_results['pointwise_mutual_information'])
 
-overall_results['mutual_information'] = mutual_information
-overall_results['predictive_entropy'] = predictive_entropy
-overall_results['predictive_entropy_over_concepts'] = predictive_entropy_over_concepts
-overall_results['unnormalised_entropy_over_concepts'] = unnormalised_entropy_over_concepts
-overall_results['number_of_semantic_sets'] = number_of_semantic_sets
-overall_results['margin_measures'] = margin_measures
-overall_results['unnormalised_margin_measures'] = unnormalised_margin_measures
+    number_of_semantic_sets = get_number_of_unique_elements_per_row(overall_results['semantic_set_ids'][0])
+    average_predictive_entropy = get_predictive_entropy(-overall_results['average_neg_log_likelihoods'])
+    average_predictive_entropy_on_subsets = []
+    predictive_entropy_on_subsets = []
+    semantic_predictive_entropy_on_subsets = []
+    num_predictions = overall_results['average_neg_log_likelihoods'].shape[-1]
+    number_of_semantic_sets_on_subsets = []
+    for i in range(1, num_predictions + 1):
+        offset = num_predictions * (i / 100)
+        average_predictive_entropy_on_subsets.append(
+            get_predictive_entropy(-overall_results['average_neg_log_likelihoods'][:, :, :int(i)]))
+        predictive_entropy_on_subsets.append(get_predictive_entropy(-overall_results['neg_log_likelihoods'][:, :, :int(i)]))
+        semantic_predictive_entropy_on_subsets.append(
+            get_predictive_entropy_over_concepts(-overall_results['average_neg_log_likelihoods'][:, :, :int(i)],
+                                                 overall_results['semantic_set_ids'][:, :, :int(i)]))
+        number_of_semantic_sets_on_subsets.append(
+            get_number_of_unique_elements_per_row(overall_results['semantic_set_ids'][0][:, :i]))
 
-overall_results['average_predictive_entropy'] = average_predictive_entropy
-for i in range(len(average_predictive_entropy_on_subsets)):
-    overall_results[f'average_predictive_entropy_on_subset_{i + 1}'] = average_predictive_entropy_on_subsets[i]
-    overall_results[f'predictive_entropy_on_subset_{i + 1}'] = predictive_entropy_on_subsets[i]
-    overall_results[f'semantic_predictive_entropy_on_subset_{i + 1}'] = semantic_predictive_entropy_on_subsets[i]
-    overall_results[f'number_of_semantic_sets_on_subset_{i + 1}'] = number_of_semantic_sets_on_subsets[i]
-overall_results['average_pointwise_mutual_information'] = average_pointwise_mutual_information
+    average_pointwise_mutual_information = get_mean_of_poinwise_mutual_information(
+        overall_results['pointwise_mutual_information'])
 
-with open(f'{config.output_dir}/{run_name}/aggregated_likelihoods_{args.generation_model}_generations.pkl',
-          'wb') as outfile:
-    pickle.dump(to_cpu(overall_results), outfile)
+    overall_results['mutual_information'] = mutual_information
+    overall_results['predictive_entropy'] = predictive_entropy
+    overall_results['predictive_entropy_over_concepts'] = predictive_entropy_over_concepts
+    overall_results['unnormalised_entropy_over_concepts'] = unnormalised_entropy_over_concepts
+    overall_results['number_of_semantic_sets'] = number_of_semantic_sets
+    overall_results['margin_measures'] = margin_measures
+    overall_results['unnormalised_margin_measures'] = unnormalised_margin_measures
 
-if args.verbose:
-    print('Margin measure', margin_measures)
-    print('Number of semantic sets', number_of_semantic_sets)
-    print('predicitve entropy shape: ', predictive_entropy.shape)
-    print('predicitve entropy per concept shape: ', predictive_entropy_over_concepts.shape)
-    print(overall_results['average_neg_log_likelihoods'].shape)
-    print(len(number_of_semantic_sets_on_subsets))
-    print(number_of_semantic_sets_on_subsets[0].shape)
-    print('average predictive entropy on subsets: ', len(average_predictive_entropy_on_subsets))
-    print(average_predictive_entropy_on_subsets[0].shape)
-    print(overall_results['pointwise_mutual_information'])
-    print(overall_results['margin_measures'])
+    overall_results['average_predictive_entropy'] = average_predictive_entropy
+    for i in range(len(average_predictive_entropy_on_subsets)):
+        overall_results[f'average_predictive_entropy_on_subset_{i + 1}'] = average_predictive_entropy_on_subsets[i]
+        overall_results[f'predictive_entropy_on_subset_{i + 1}'] = predictive_entropy_on_subsets[i]
+        overall_results[f'semantic_predictive_entropy_on_subset_{i + 1}'] = semantic_predictive_entropy_on_subsets[i]
+        overall_results[f'number_of_semantic_sets_on_subset_{i + 1}'] = number_of_semantic_sets_on_subsets[i]
+    overall_results['average_pointwise_mutual_information'] = average_pointwise_mutual_information
+
+    with open(f'{config.output_dir}/{run_name}/aggregated_likelihoods_{args.generation_model}_generations.pkl',
+              'wb') as outfile:
+        pickle.dump(to_cpu(overall_results), outfile)
+
+    if args.verbose:
+        print('Margin measure', margin_measures)
+        print('Number of semantic sets', number_of_semantic_sets)
+        print('predicitve entropy shape: ', predictive_entropy.shape)
+        print('predicitve entropy per concept shape: ', predictive_entropy_over_concepts.shape)
+        print(overall_results['average_neg_log_likelihoods'].shape)
+        print(len(number_of_semantic_sets_on_subsets))
+        print(number_of_semantic_sets_on_subsets[0].shape)
+        print('average predictive entropy on subsets: ', len(average_predictive_entropy_on_subsets))
+        print(average_predictive_entropy_on_subsets[0].shape)
+        print(overall_results['pointwise_mutual_information'])
+        print(overall_results['margin_measures'])
