@@ -81,7 +81,7 @@ for run_id in run_ids_to_analyze:
 
             keys_to_use = ('ids', 'predictive_entropy', 'mutual_information', 'average_predictive_entropy',\
                             'average_pointwise_mutual_information', 'average_neg_log_likelihood_of_most_likely_gen',\
-                            'average_neg_log_likelihood_of_second_most_likely_gen', 'neg_log_likelihood_of_most_likely_gen',\
+                            'energies', 'neg_log_likelihood_of_most_likely_gen',\
                             'predictive_entropy_over_concepts', 'number_of_semantic_sets', 'unnormalised_entropy_over_concepts')
 
             likelihoods_small = dict((k, likelihoods[k]) for k in keys_to_use + tuple(subset_keys))
