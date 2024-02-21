@@ -96,8 +96,8 @@ if __name__ == '__main__':
 
                 sequence_embeddings = likelihoods['sequence_embeddings']
                 likelihoods_small["energies"] = likelihoods_small['energies'].mean(dim=1)
-                likelihoods_small["energies_first_token"] =-1 * likelihoods_small['energies_first_token'].mean(dim=1)
-                likelihoods_small["energies_average_over_sequence"] = -1 *likelihoods_small['energies_average_over_sequence'].mean(dim=1)
+                likelihoods_small["energies_first_token"] = likelihoods_small['energies_first_token'].mean(dim=1)
+                likelihoods_small["energies_average_over_sequence"] = likelihoods_small['energies_average_over_sequence'].mean(dim=1)
                 likelihoods_df = pd.DataFrame.from_dict(likelihoods_small)
 
                 likelihoods_df.rename(columns={'ids': 'id'}, inplace=True)
