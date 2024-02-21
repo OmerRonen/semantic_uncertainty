@@ -99,7 +99,7 @@ with torch.no_grad():
         else:
             question = question.split('Q: ')[-1].split('A: ')[0]
 
-        generated_texts = '\n'.join(sequence['cleaned_generated_texts'][:number_of_few_shot_samples])
+        generated_texts = '\n'.join(sequence['generated_texts'][:number_of_few_shot_samples])
         most_likely_answer = sequence['most_likely_generation']
         correct = 1.0 if sequence['rougeL_to_target'] > 0.3 else 0.0
         base_prompt = prompt_template.format(question, generated_texts, most_likely_answer)
