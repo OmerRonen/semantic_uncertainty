@@ -54,7 +54,7 @@ def get_overall_log_likelihoods(list_of_results):
 
     list_of_keys = ['neg_log_likelihoods', 'average_neg_log_likelihoods', 'sequence_embeddings',\
                     'pointwise_mutual_information', 'average_neg_log_likelihood_of_most_likely_gen',\
-                    'neg_log_likelihood_of_most_likely_gen', 'semantic_set_ids']
+                    'neg_log_likelihood_of_most_likely_gen', 'semantic_set_ids', "energies"]
 
     for key in list_of_keys:
         list_of_ids = []
@@ -106,6 +106,12 @@ def get_log_likelihood_mean(neg_log_likelihoods):
 
     return mean_of_neg_log_likelihoods
 
+def get_energy_mean(energy):
+    """Compute softmax variance of approximate posterior predictive"""
+    mean_across_models = torch.mean(energy, dim=0)
+    mean_of_neg_log_likelihoods = torch.mean(mean_across_models, dim=1)
+
+    return mean_of_neg_log_likelihoods
 
 def get_mean_of_poinwise_mutual_information(pointwise_mutual_information):
     """Compute mean of pointwise mutual information"""
@@ -158,6 +164,7 @@ with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations_{
 overall_results = get_overall_log_likelihoods(list_of_results)
 mutual_information = get_mutual_information(-overall_results['neg_log_likelihoods'])
 predictive_entropy = get_predictive_entropy(-overall_results['neg_log_likelihoods'])
+energy = get_energy_mean(overall_results['energies'])
 predictive_entropy_over_concepts = get_predictive_entropy_over_concepts(-overall_results['average_neg_log_likelihoods'],
                                                                         overall_results['semantic_set_ids'])
 unnormalised_entropy_over_concepts = get_predictive_entropy_over_concepts(-overall_results['neg_log_likelihoods'],
