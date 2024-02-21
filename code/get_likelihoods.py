@@ -74,6 +74,8 @@ def get_neg_loglikelihoods(model, sequences):
             average_unconditioned_neg_log_likelihoods = torch.zeros((generations.shape[0],))
             neg_log_likelihoods = torch.zeros((generations.shape[0],))
             energies = torch.zeros((generations.shape[0],))
+            energies_first_token = torch.zeros((generations.shape[0],))
+            energies_average_over_sequence = torch.zeros((generations.shape[0],))
 
             neg_unconditioned_log_likelihoods = torch.zeros((generations.shape[0],))
             pointwise_mutual_information = torch.zeros((generations.shape[0],))
@@ -104,6 +106,8 @@ def get_neg_loglikelihoods(model, sequences):
                 logits = model_output['logits']
                 logits_new = logits[0, len(prompt) - 1:]
                 energies[generation_index] = get_energy_logits(logits_new)
+                energies_first_token[generation_index] = get_energy_logits(logits_new, first_only=True)
+                energies_average_over_sequence[generation_index] = get_energy_logits(logits_new, sequence_average=True)
                 average_neg_log_likelihoods[generation_index] = average_neg_log_likelihood
                 average_unconditioned_neg_log_likelihoods[generation_index] = average_unconditioned_neg_log_likelihood
                 neg_log_likelihoods[generation_index] = average_neg_log_likelihood * (len(generation) - len(prompt))
@@ -143,6 +147,8 @@ def get_neg_loglikelihoods(model, sequences):
             result_dict['generations'] = generations
             result_dict['average_neg_log_likelihoods'] = average_neg_log_likelihoods
             result_dict['energies'] = energies
+            result_dict['energies_first_token'] = energies_first_token
+            result_dict['energies_average_over_sequence'] = energies_average_over_sequence
             result_dict['neg_log_likelihoods'] = neg_log_likelihoods
             result_dict['sequence_embeddings'] = most_likely_generation_embedding
             result_dict['most_likely_sequence_embedding'] = most_likely_generation

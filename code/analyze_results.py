@@ -95,7 +95,7 @@ if __name__ == '__main__':
                         likelihoods_small[key] = torch.squeeze(likelihoods_small[key].cpu())
 
                 sequence_embeddings = likelihoods['sequence_embeddings']
-
+                likelihoods_small["energies"] = likelihoods_small['energies'].mean(dim=1)
                 likelihoods_df = pd.DataFrame.from_dict(likelihoods_small)
 
                 likelihoods_df.rename(columns={'ids': 'id'}, inplace=True)
@@ -155,14 +155,16 @@ if __name__ == '__main__':
         result_dict['average_rougeL_auroc'] = roc_auc_score(result_df['correct'],
                                                                             result_df['rougeL_among_generations'])
 
+        result_dict['average_energy_auroc'] = roc_auc_score(1 - result_df['correct'], result_df['energies'])
+
         average_neg_llh_most_likely_gen_auroc = roc_auc_score(
             1 - result_df['correct'], result_df['average_neg_log_likelihood_of_most_likely_gen'])
         result_dict['average_neg_llh_most_likely_gen_auroc'] = average_neg_llh_most_likely_gen_auroc
         result_dict['rougeL_based_accuracy'] = result_df['correct'].mean()
 
-        result_dict['margin_measure_auroc'] = roc_auc_score(
-            1 - result_df['correct'], result_df['average_neg_log_likelihood_of_most_likely_gen'] +
-            result_df['average_neg_log_likelihood_of_second_most_likely_gen'])
+        # result_dict['margin_measure_auroc'] = roc_auc_score(
+        #     1 - result_df['correct'], result_df['average_neg_log_likelihood_of_most_likely_gen'] +
+        #     result_df['average_neg_log_likelihood_of_second_most_likely_gen'])
 
         if args.verbose:
             print('Number of samples:', len(result_df))
@@ -178,7 +180,8 @@ if __name__ == '__main__':
                     result_df['predictive_entropy_over_concepts'] - 3 * result_df['rougeL_among_generations']))
             print('RougeL among generations auroc',
                   roc_auc_score(result_df['correct'], result_df['rougeL_among_generations']))
-            print('margin measure auroc:', result_dict['margin_measure_auroc'])
+            # print('margin measure auroc:', result_dict['margin_measure_auroc'])
+            print('average_energy_auroc:', result_dict['average_energy_auroc'])
 
         # Measure the AURROCs when using different numbers of generations to compute our uncertainty measures.
         ln_aurocs = []

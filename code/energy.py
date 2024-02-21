@@ -37,7 +37,7 @@ def calculate_energy(X, model, mu=None, sigma=None, batch_size=32, fast=True):
     return log_density
 
 
-def get_energy_logits(pre_softmax):
+def get_energy_logits(pre_softmax, first_only=False, sequence_average=False):
     pre_softmax = pre_softmax.to(dtype=torch.float64)
     energy_total = None
     temp = 1
@@ -46,7 +46,7 @@ def get_energy_logits(pre_softmax):
     vocab_size = pre_softmax.shape[2]
     # energies = torch.zeros(pre_softmax.shape[1])
     for i in range(pre_softmax.shape[1]):
-        i = 0
+        # i = 0
         token_pre_softmax = pre_softmax[:, i, :]
         token_pre_softmax = token_pre_softmax / temp
         probs = torch.softmax(token_pre_softmax, dim=-1)
@@ -57,11 +57,16 @@ def get_energy_logits(pre_softmax):
         c_term = torch.exp(-2 * log_c)
         energy = factor_mul_log + torch.log(1 + torch.sum((probs ** 2)) * c_term)
         # energies[i] = energy
+        denominator = vocab_size
+        if sequence_average:
+            denominator *= pre_softmax.shape[1]
 
         if energy_total is None:
-            energy_total = energy / (vocab_size)
+            energy_total = energy / denominator
         else:
-            energy_total += energy / (vocab_size)
+            energy_total += energy / denominator
+        if first_only:
+            break
     # print(np.mean(energies))
     return energy_total
 
