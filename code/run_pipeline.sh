@@ -5,7 +5,7 @@
 #SBATCH -o triviaqa.out #File to which standard out will be written
 #SBATCH -p jsteinhardt
 #SBATCH --gres=gpu:1
-#SBATCH --mem=100G
+#SBATCH --mem=200G
 
 
 run_id=$1
