@@ -40,6 +40,8 @@ run_name = wandb.run.name
 
 llh_shift = torch.tensor(5.0)
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 def get_overall_log_likelihoods(list_of_results):
     """Compute log likelihood of all generations under their given context.
@@ -134,8 +136,8 @@ def get_predictive_entropy_over_concepts(log_likelihoods, semantic_set_ids):
     entropies = []
     for row_index in range(mean_across_models.shape[0]):
         aggregated_likelihoods = []
-        row = mean_across_models[row_index]
-        semantic_set_ids_row = semantic_set_ids[row_index]
+        row = mean_across_models[row_index].to(device)
+        semantic_set_ids_row = semantic_set_ids[row_index].to(device)
         for semantic_set_id in torch.unique(semantic_set_ids_row):
             aggregated_likelihoods.append(torch.logsumexp(row[semantic_set_ids_row == semantic_set_id], dim=0))
         aggregated_likelihoods = torch.tensor(aggregated_likelihoods) - llh_shift
