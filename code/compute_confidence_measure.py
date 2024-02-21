@@ -58,7 +58,8 @@ def get_overall_log_likelihoods(list_of_results):
 
     list_of_keys = ['neg_log_likelihoods', 'average_neg_log_likelihoods', 'sequence_embeddings', \
                     'pointwise_mutual_information', 'average_neg_log_likelihood_of_most_likely_gen', \
-                    'neg_log_likelihood_of_most_likely_gen', 'semantic_set_ids', "energies"]
+                    'neg_log_likelihood_of_most_likely_gen', 'semantic_set_ids', "energies", "energies_first_token",
+                    "energies_average_over_sequence"]
 
     for key in list_of_keys:
         list_of_ids = []
