@@ -118,15 +118,13 @@ if __name__ == '__main__':
         result_dict['accuracy'] = result_df['correct'].mean()
 
         # Compute the auroc for the length normalized predictive entropy
-        ln_predictive_entropy_auroc = roc_auc_score(1 - result_df['correct'],
-                                                                    result_df['average_predictive_entropy'])
+        ln_predictive_entropy_auroc = roc_auc_score(1 - result_df['correct'],result_df['average_predictive_entropy'])
         result_dict['ln_predictive_entropy_auroc'] = ln_predictive_entropy_auroc
 
         predictive_entropy_auroc = roc_auc_score(1 - result_df['correct'], result_df['predictive_entropy'])
         result_dict['predictive_entropy_auroc'] = predictive_entropy_auroc
 
-        entropy_over_concepts_auroc = roc_auc_score(1 - result_df['correct'],
-                                                                    result_df['predictive_entropy_over_concepts'])
+        entropy_over_concepts_auroc = roc_auc_score(1 - result_df['correct'],result_df['predictive_entropy_over_concepts'])
         result_dict['entropy_over_concepts_auroc'] = entropy_over_concepts_auroc
 
         if 'unnormalised_entropy_over_concepts' in result_df.columns:
@@ -157,10 +155,10 @@ if __name__ == '__main__':
         result_dict['average_rougeL_auroc'] = roc_auc_score(result_df['correct'],
                                                                             result_df['rougeL_among_generations'])
 
-        result_dict['average_energy_auroc'] = roc_auc_score(1 - result_df['correct'], result_df['energies'])
-        result_dict["average_energy_first_token_auroc"] = roc_auc_score(1 - result_df['correct'],
+        result_dict['average_energy_auroc'] = roc_auc_score(result_df['correct'], result_df['energies'])
+        result_dict["average_energy_first_token_auroc"] = roc_auc_score(result_df['correct'],
                                                                                    result_df['energies_first_token'])
-        result_dict["average_energy_average_over_sequence_auroc"] = roc_auc_score(1 - result_df['correct'],
+        result_dict["average_energy_average_over_sequence_auroc"] = roc_auc_score(result_df['correct'],
                                                                                          result_df[
                                                                                              'energies_average_over_sequence'])
         average_neg_llh_most_likely_gen_auroc = roc_auc_score(
