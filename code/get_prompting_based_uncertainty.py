@@ -8,8 +8,8 @@ import accelerate
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import sklearn
 import torch
+from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -121,7 +121,7 @@ with torch.no_grad():
         labels_across_datasets += corrects
         p_trues_across_datasets += p_trues
 
-    p_true_auroc = sklearn.metrics.roc_auc_score(1 - torch.tensor(corrects), torch.tensor(p_trues))
+    p_true_auroc = roc_auc_score(1 - torch.tensor(corrects), torch.tensor(p_trues))
 
     # Store p_true aurocs in a pickle file
     with open(f'{config.output_dir}/{run_name}/{model_name}_p_true_aurocs.pkl', 'wb') as outfile:
