@@ -74,7 +74,7 @@ for sequence in subset_of_sequences_for_few_shot_prompt:
     question = sequence['question']
     question = question.split('Question: ')[-1].split('Answer: ')[0]
     prompt = sequence['prompt']
-    generated_texts = '\n'.join(sequence['cleaned_generated_texts'][:number_of_few_shot_samples])
+    generated_texts = '\n'.join(sequence['generated_texts'][:number_of_few_shot_samples])
 
     most_likely_answer = sequence['most_likely_generation']
     correct = ' True' if sequence['rougeL_to_target'] > 0.3 else ' False'
