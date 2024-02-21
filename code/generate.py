@@ -17,7 +17,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 parser = argparse.ArgumentParser()
 parser.add_argument('--type_of_question', type=str)
 parser.add_argument('--num_generations_per_prompt', type=int, default=5)
-parser.add_argument('--fraction_of_data_to_use', type=float, default=0.05)
+parser.add_argument('--fraction_of_data_to_use', type=float, default=0.005)
 parser.add_argument('--model', type=str, default='opt-350m')
 parser.add_argument('--run_id', type=str, default='run_1')
 parser.add_argument('--temperature', type=float, default='1.0')
