@@ -2,7 +2,7 @@
 #SBATCH --job-name=triviaqa
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=omer_ronen@berkeley.edu
-#SBATCH -o triviaqa.out #File to which standard out will be written
+#SBATCH -o triviaqa_small.out #File to which standard out will be written
 #SBATCH -p jsteinhardt
 #SBATCH --gres=gpu:A100:1
 #SBATCH --mem=100G
