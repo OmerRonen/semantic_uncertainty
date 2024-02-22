@@ -59,7 +59,7 @@ def get_energy_logits(pre_softmax, first_only=False, sequence_average=False, sum
         return get_energy_sum_det(pre_softmax)
     energy_total = None
     # energy_vec = []
-    temp = 0.1
+    temp = 10
     if len(pre_softmax.shape) == 2:
         pre_softmax = pre_softmax.unsqueeze(0)
     vocab_size = pre_softmax.shape[2]
