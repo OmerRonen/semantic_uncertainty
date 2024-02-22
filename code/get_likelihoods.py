@@ -102,9 +102,16 @@ def get_neg_loglikelihoods(model, sequences):
                 hidden_states = model_output['hidden_states']
                 average_neg_log_likelihood = model_output['loss']
 
+
+
                 average_unconditioned_neg_log_likelihood = unconditioned_model_output['loss']
+
+                logits =  model.generate(prompt, max_new_tokens=5, output_scores=True, return_dict_in_generate=True)
+                print(logits)
+
+
                 # print(model_output['logits'].shape)
-                logits = model_output['logits']
+                # logits = model_output['logits']
                 logits_new = logits[0, len(prompt) - 1:]
                 energies[generation_index] = get_energy_logits(logits_new)
                 energies_first_token[generation_index] = get_energy_logits(logits_new, first_only=True)
