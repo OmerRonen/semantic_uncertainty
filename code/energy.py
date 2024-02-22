@@ -284,10 +284,10 @@ def net_derivative(x, net, option=4, derivative=False, llm=True):
         n_batches = int(np.ceil(dxs.shape[0] / _batch_size))
         batches = np.arange(0, n_batches, 1)
         dys_vec_batches = []
-        if llm:
-            # sample 10 pct of the total number of batches
-            batches = np.random.choice(batches, int(0.1 * n_batches), replace=False)
-        J = torch.zeros((n_preds, latent_dim, length_seq, dict_size)).cpu()  # loop will fill in Jacobian
+        # if llm:
+        #     # sample 10 pct of the total number of batches
+        #     batches = np.random.choice(batches, int(0.1 * n_batches), replace=False)
+        # J = torch.zeros((n_preds, latent_dim, length_seq, dict_size)).cpu()  # loop will fill in Jacobian
 
         for batch_idx in tqdm(batches):
             start_idx = batch_idx * _batch_size
@@ -300,11 +300,11 @@ def net_derivative(x, net, option=4, derivative=False, llm=True):
             dys_batch = net(dxs_batch).detach().cpu() - pred_x[start_idx:end_idx]
 
             dys_vec_batches.append(dys_batch)
-            if llm:
-                J[batch_idx * _batch_size: (batch_idx + 1) * _batch_size, ...] = dys_batch / eps
-        if not llm:
-            dys_vec = torch.cat(dys_vec_batches, dim=0)
-            J = dys_vec / eps
+            # if llm:
+            #     J[batch_idx * _batch_size: (batch_idx + 1) * _batch_size, ...] = dys_batch / eps
+        # if not llm:
+        dys_vec = torch.cat(dys_vec_batches, dim=0)
+        J = dys_vec / eps
         shift = np.arange(0, latent_dim * batch_size, batch_size)
         J = torch.stack([J[j + shift, ...] for j in range(batch_size)], dim=0)
         J = J.detach().cpu()
