@@ -226,7 +226,7 @@ def calculate_det_grad(X, net, llm=True):
     return dets
 
 
-def net_derivative(x, net, option=4, derivative=False):
+def net_derivative(x, net, option=4, derivative=False, llm=True):
     net.eval()
     # LOGGER.debug(f"model device: {x.device}")
 
@@ -278,9 +278,14 @@ def net_derivative(x, net, option=4, derivative=False):
         dxs = torch.cat(dxs_list, dim=0)
         _batch_size = 32
         n_batches = int(np.ceil(dxs.shape[0] / _batch_size))
+        batches = np.arange(0, n_batches, 1)
         dys_vec_batches = []
+        if llm:
+            # sample 10 pct of the total number of batches
+            batches =  np.random.choice(batches, int(0.1 * n_batches), replace=False)
 
-        for batch_idx in tqdm(range(n_batches)):
+
+        for batch_idx in tqdm(batches):
             start_idx = batch_idx * _batch_size
             end_idx = (batch_idx + 1) * _batch_size
 
