@@ -14,7 +14,7 @@ model=$2
 cd /accounts/campus/omer_ronen/projects/semantic_uncertainty
 
 # run generation
-/accounts/campus/omer_ronen/.conda/envs/lso/bin/python code/generate.py --num_generations_per_prompt='5' --model=$model --fraction_of_data_to_use='1' --run_id=$run_id --temperature='1' --num_beams='1' --top_p='1.0'
+#/accounts/campus/omer_ronen/.conda/envs/lso/bin/python code/generate.py --num_generations_per_prompt='5' --model=$model --fraction_of_data_to_use='1' --run_id=$run_id --temperature='1' --num_beams='1' --top_p='1.0'
 # get semantic similarities
 #/accounts/campus/omer_ronen/.conda/envs/lso/bin/python clean_generated_strings.py  --generation_model=$model --run_id=$run_id
 /accounts/campus/omer_ronen/.conda/envs/lso/bin/python code/get_semantic_similarities.py --generation_model=$model --run_id=$run_id

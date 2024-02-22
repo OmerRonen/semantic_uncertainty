@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     wandb.init(project='nlg_uncertainty', id=args.run_id, config=args, resume='allow')
 
-    run_name = wandb.run.name
+    run_name = args.run_id
 
     with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations.pkl', 'rb') as infile:
         sequences = pickle.load(infile)
