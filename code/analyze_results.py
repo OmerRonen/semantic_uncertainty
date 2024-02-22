@@ -95,9 +95,9 @@ if __name__ == '__main__':
                         likelihoods_small[key] = torch.squeeze(likelihoods_small[key].cpu())
 
                 sequence_embeddings = likelihoods['sequence_embeddings']
-                likelihoods_small["energies"] = likelihoods_small['energies'].mean(dim=1)
-                likelihoods_small["energies_first_token"] = likelihoods_small['energies_first_token'].mean(dim=1)
-                likelihoods_small["energies_average_over_sequence"] = likelihoods_small['energies_average_over_sequence'].mean(dim=1)
+                likelihoods_small["energies"] = likelihoods_small['energies'].min(dim=1)
+                likelihoods_small["energies_first_token"] = likelihoods_small['energies_first_token'].min(dim=1)
+                likelihoods_small["energies_average_over_sequence"] = likelihoods_small['energies_average_over_sequence'].min(dim=1)
                 # likelihoods_small["energies_sum_det"] = likelihoods_small['energies_sum_det'].mean(dim=1)
                 likelihoods_df = pd.DataFrame.from_dict(likelihoods_small)
 
