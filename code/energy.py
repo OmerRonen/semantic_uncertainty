@@ -39,7 +39,8 @@ def calculate_energy(X, model, mu=None, sigma=None, batch_size=32, fast=True):
 
 def get_energy_logits(pre_softmax, first_only=False, sequence_average=False):
     pre_softmax = pre_softmax.to(dtype=torch.float64)
-    energy_total = None
+    # energy_total = None
+    energy_vec = []
     temp = 1
     if len(pre_softmax.shape) == 2:
         pre_softmax = pre_softmax.unsqueeze(0)
@@ -61,13 +62,16 @@ def get_energy_logits(pre_softmax, first_only=False, sequence_average=False):
         if sequence_average:
             denominator *= pre_softmax.shape[1]
 
-        if energy_total is None:
-            energy_total = energy / denominator
-        else:
-            energy_total += energy / denominator
+        energy_vec.append(energy / denominator)
+        #
+        # if energy_total is None:
+        #     energy_total = energy / denominator
+        # else:
+        #     energy_total += energy / denominator
         if first_only:
             break
     # print(np.mean(energies))
+    energy_total = torch.stack(energy_vec, dim=0).logsumexp(dim=0)
     return energy_total
 
 
