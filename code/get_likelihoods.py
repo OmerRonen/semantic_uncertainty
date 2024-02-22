@@ -106,10 +106,10 @@ def get_neg_loglikelihoods(model, sequences):
 
 
                 average_unconditioned_neg_log_likelihood = unconditioned_model_output['loss']
-
+                input_ids = torch.reshape(prompt.to(device), (1, -1))
                 logits =  model.generate(torch.reshape(prompt.to(device), (1, -1)), max_new_tokens=5, output_scores=True, return_dict_in_generate=True).scores
                 # print(logits)
-                input_ids = input_ids.to(model.device)
+                # input_ids = input_ids.to(model.device)
                 inputs_embeds = get_embeds(model.model, input_ids)  # Get embeddings of input_ids
                 model.hidden_dim = inputs_embeds.shape[-1]
                 f_input_embeds = flatten_input_embeds(inputs_embeds)
