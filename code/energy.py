@@ -30,13 +30,15 @@ class LLModel(nn.Module):
         for i in range(self.max_length):
             new_logits = self.model(inputs_embeds=input_embeds).logits[:, -1, :].unsqueeze(1)
             new_token = new_logits.argmax(-1)
-            new_logits_list.append(new_logits)
+            new_logits_top_k_tokens = new_logits.topk(30)[1]
+            new_logits_list.append(new_logits_top_k_tokens)
             # print(f"top 5 largest logits: {new_logits.topk(20)[0]}")
 
             new_embed = get_embeds(self.model, new_token)
             input_embeds = torch.cat([input_embeds, new_embed], dim=1)
 
         return torch.cat(new_logits_list, dim=1)
+
 
 
 def get_energy_sum_det(logits):
