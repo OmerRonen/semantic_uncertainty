@@ -11,7 +11,7 @@ from utils import unflatten_input_embeds, get_embeds
 
 
 class LLModel(nn.Module):
-    def __init__(self, model: PreTrainedModel, tokenizer: AutoTokenizer,hidden_dim,  max_length=10):
+    def __init__(self, model: PreTrainedModel, tokenizer: AutoTokenizer, hidden_dim, max_length=10):
         super(LLModel, self).__init__()
         self.model = model
         self.max_length = max_length
@@ -38,6 +38,7 @@ class LLModel(nn.Module):
 
         return torch.cat(new_logits_list, dim=1)
 
+
 def get_energy_sum_det(logits):
     logits = logits.to(dtype=torch.float64)
     probs = torch.nn.functional.softmax(logits, dim=-1)
@@ -53,6 +54,7 @@ def get_energy_sum_det(logits):
     c_log_factor = torch.log(1 + (probs ** (-1)).sum() * torch.exp(normalizing_constant_log))
     energy = probs_log_factor + c_log_factor
     return energy
+
 
 def calculate_energy(X, model, mu=None, sigma=None, batch_size=32, fast=True):
     # calculate gaussian density of input
@@ -268,6 +270,8 @@ def net_derivative(x, net, option=4, derivative=False, llm=True):
         eps = 1e-4
         batch_size, latent_dim = x.shape
         pred_x = net(x.clone()).detach().cpu()
+        n_preds, length_seq, dict_size = pred_x.shape
+
         dxs_list = []
         pred_x = pred_x.repeat(latent_dim, 1, 1)
         for i in range(latent_dim):
@@ -282,8 +286,8 @@ def net_derivative(x, net, option=4, derivative=False, llm=True):
         dys_vec_batches = []
         if llm:
             # sample 10 pct of the total number of batches
-            batches =  np.random.choice(batches, int(0.1 * n_batches), replace=False)
-
+            batches = np.random.choice(batches, int(0.1 * n_batches), replace=False)
+        J = torch.zeros((n_preds, latent_dim, length_seq, dict_size)).cpu()  # loop will fill in Jacobian
 
         for batch_idx in tqdm(batches):
             start_idx = batch_idx * _batch_size
@@ -296,8 +300,11 @@ def net_derivative(x, net, option=4, derivative=False, llm=True):
             dys_batch = net(dxs_batch).detach().cpu() - pred_x[start_idx:end_idx]
 
             dys_vec_batches.append(dys_batch)
-        dys_vec = torch.cat(dys_vec_batches, dim=0)
-        J = dys_vec / eps
+            if llm:
+                J[batch_idx * _batch_size: (batch_idx + 1) * _batch_size, ...] = dys_batch / eps
+        if not llm:
+            dys_vec = torch.cat(dys_vec_batches, dim=0)
+            J = dys_vec / eps
         shift = np.arange(0, latent_dim * batch_size, batch_size)
         J = torch.stack([J[j + shift, ...] for j in range(batch_size)], dim=0)
         J = J.detach().cpu()
@@ -312,6 +319,7 @@ def net_derivative(x, net, option=4, derivative=False, llm=True):
     if J.shape[-1] == 2 and not derivative:
         J = J[..., 0]
     return J
+
 
 def calculate_density(X, model, mu, sigma, batch_size=32, fast=False):
     # calculate gaussian density of input
