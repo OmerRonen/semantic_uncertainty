@@ -37,7 +37,9 @@ class LLModel(nn.Module):
             new_embed = get_embeds(self.model, new_token)
             input_embeds = torch.cat([input_embeds, new_embed], dim=1)
 
-        return torch.cat(new_logits_list, dim=1)
+        results =  torch.cat(new_logits_list, dim=1)
+        print(f"results shape: {results.shape}")
+        return results
 
 
 
