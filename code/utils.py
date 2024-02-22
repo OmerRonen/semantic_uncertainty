@@ -19,7 +19,7 @@ def get_embeds(model, input_ids):
     elif isinstance(model, OpenLlamaForCausalLM):
         inputs_embeds = model.model.embed_tokens(input_ids)
     elif isinstance(model, OPTModel):
-        inputs_embeds = model.model.embed_tokens(input_ids)
+        inputs_embeds =  model.model.decoder.embed_tokens(input_ids)
     else:
         raise ValueError(f"model {model} not supported")
     return inputs_embeds
