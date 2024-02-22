@@ -276,7 +276,7 @@ def net_derivative(x, net, option=4, derivative=False):
             dxs_list.append(x.clone() + dx)
         del x
         dxs = torch.cat(dxs_list, dim=0)
-        _batch_size = 128
+        _batch_size = 32
         n_batches = int(np.ceil(dxs.shape[0] / _batch_size))
         dys_vec_batches = []
 
