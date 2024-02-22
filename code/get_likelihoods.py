@@ -106,7 +106,7 @@ def get_neg_loglikelihoods(model, sequences):
 
                 average_unconditioned_neg_log_likelihood = unconditioned_model_output['loss']
 
-                logits =  model.generate(prompt.to(device), max_new_tokens=5, output_scores=True, return_dict_in_generate=True)
+                logits =  model.generate(torch.reshape(prompt.to(device), (1, -1)), max_new_tokens=5, output_scores=True, return_dict_in_generate=True)
                 print(logits)
 
 
