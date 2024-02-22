@@ -5,7 +5,38 @@ from tqdm import tqdm
 from torch import nn
 from torch.func import jacfwd
 from torch.distributions import Distribution
+from transformers import PreTrainedModel, AutoTokenizer
 
+from utils import unflatten_input_embeds, get_embeds
+
+
+class LLModel(nn.Module):
+    def __init__(self, model: PreTrainedModel, tokenizer: AutoTokenizer,hidden_dim,  max_length=10):
+        super(LLModel, self).__init__()
+        self.model = model
+        self.max_length = max_length
+        self.hidden_dim = hidden_dim
+        self.device = "gpu" if torch.cuda.is_available() else "cpu"
+        self.tokenizer = tokenizer
+        self.model.to(self.device)
+
+    def forward(self, input_embeds: torch.Tensor):
+        """Returns the logits of self.max_length next tokens after the input tokens"""
+        # input_embeds = flatten_input_embeds(get_embeds(self.model, input_ids))
+        n_words = input_embeds.shape[1] // self.hidden_dim
+        shape = (n_words, self.hidden_dim)
+        input_embeds = unflatten_input_embeds(input_embeds, shape)
+        new_logits_list = []
+        for i in range(self.max_length):
+            new_logits = self.model(inputs_embeds=input_embeds).logits[:, -1, :].unsqueeze(1)
+            new_token = new_logits.argmax(-1)
+            new_logits_list.append(new_logits)
+            # print(f"top 5 largest logits: {new_logits.topk(20)[0]}")
+
+            new_embed = get_embeds(self.model, new_token)
+            input_embeds = torch.cat([input_embeds, new_embed], dim=1)
+
+        return torch.cat(new_logits_list, dim=1)
 
 def get_energy_sum_det(logits):
     logits = logits.to(dtype=torch.float64)
@@ -276,3 +307,32 @@ def net_derivative(x, net, option=4, derivative=False):
     if J.shape[-1] == 2 and not derivative:
         J = J[..., 0]
     return J
+
+def calculate_density(X, model, mu, sigma, batch_size=32, fast=False):
+    # calculate gaussian density of input
+    model.eval()
+    batch_size = min(batch_size, X.shape[0])
+    # X = X.to(device="cpu", dtype=model.dtype)
+    # mu = mu.to(device="cpu", dtype=model.dtype)
+    if len(X.shape) == 3:
+        # flatten the input except for the batch dimension
+        X = X.reshape(X.shape[0], X.shape[1] * X.shape[2])
+    if mu is None:
+        log_density = torch.zeros(X.shape[0])
+    else:
+        diff = (X - mu).unsqueeze(1).to(device="cpu", dtype=model.dtype)
+        sigma = sigma.to(device="cpu", dtype=model.dtype)
+        log_density = - 0.5 * (diff @ torch.inverse(sigma) @ diff.transpose(1, 2))
+
+    n_batches = int(np.ceil(X.shape[0] / batch_size))
+    det_grad_list = []
+    for b in range(n_batches):
+        X_b_gpu = X[b * batch_size: (b + 1) * batch_size, ...]  # .to(device=model.device, dtype=model.dtype)
+        if fast:
+            det_grad_list.append(calculate_det_grad_fast(X_b_gpu, model).detach().cpu())
+        else:
+            det_grad_list.append(calculate_det_grad(X_b_gpu, model).detach().cpu())
+    det_grad = torch.cat(det_grad_list, dim=0)
+
+    log_density = det_grad + torch.squeeze(log_density)
+    return log_density

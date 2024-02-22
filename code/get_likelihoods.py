@@ -9,8 +9,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import wandb
 
-from utils import to_cpu
-from energy import get_energy_logits
+from utils import to_cpu, get_embeds, flatten_input_embeds
+from energy import get_energy_logits, LLModel, calculate_density
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--evaluation_model', type=str, default='opt-2.7b')
@@ -59,6 +59,7 @@ with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations_s
 
 
 def get_neg_loglikelihoods(model, sequences):
+    llm = LLModel(model=model, tokenizer=tokenizer, max_length=5, hidden_dim=model.hidden_size)
     with torch.no_grad():
         result = []
         for sample in sequences:
@@ -108,12 +109,18 @@ def get_neg_loglikelihoods(model, sequences):
 
                 logits =  model.generate(torch.reshape(prompt.to(device), (1, -1)), max_new_tokens=5, output_scores=True, return_dict_in_generate=True).scores
                 # print(logits)
+                input_ids = input_ids.to(model.device)
+                inputs_embeds = get_embeds(model.model, input_ids)  # Get embeddings of input_ids
+                model.hidden_dim = inputs_embeds.shape[-1]
+                f_input_embeds = flatten_input_embeds(inputs_embeds)
+                # continue
+                energy = calculate_density(f_input_embeds, model, mu=None, sigma=None, fast=False).detach().cpu().numpy()
 
 
                 # print(model_output['logits'].shape)
                 # logits = model_output['logits']
                 logits_new = torch.cat(logits)
-                energies[generation_index] = get_energy_logits(logits_new)
+                energies[generation_index] = energy
                 energies_first_token[generation_index] = get_energy_logits(logits_new, first_only=True)
                 energies_average_over_sequence[generation_index] = get_energy_logits(logits_new, sequence_average=True)
                 # energies_sum_det[generation_index] = get_energy_logits(logits_new, sum_det=True)

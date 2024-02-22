@@ -1,6 +1,26 @@
 import torch
+from transformers import GPT2LMHeadModel, OPTForCausalLM, FalconForCausalLM, OpenLlamaForCausalLM
 
 
+def flatten_input_embeds(input_embeds):
+    return input_embeds.reshape(input_embeds.shape[0], -1)
+
+
+def unflatten_input_embeds(input_embeds, input_shape):
+    return input_embeds.reshape(input_embeds.shape[0], *input_shape)
+
+def get_embeds(model, input_ids):
+    if isinstance(model, GPT2LMHeadModel):
+        inputs_embeds = model.transformer.wte(input_ids)
+    elif isinstance(model, OPTForCausalLM):
+        inputs_embeds = model.model.decoder.embed_tokens(input_ids)
+    elif isinstance(model, FalconForCausalLM):
+        inputs_embeds = model.transformer.word_embeddings(input_ids)
+    elif isinstance(model, OpenLlamaForCausalLM):
+        inputs_embeds = model.model.embed_tokens(input_ids)
+    else:
+        raise ValueError(f"model {model} not supported")
+    return inputs_embeds
 def to_cpu(obj):
     """
     Recursively moves tensors in a dictionary or in any nested structure
