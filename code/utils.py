@@ -1,5 +1,5 @@
 import torch
-from transformers import GPT2LMHeadModel, OPTForCausalLM, FalconForCausalLM, OpenLlamaForCausalLM
+from transformers import GPT2LMHeadModel, OPTForCausalLM, FalconForCausalLM, OpenLlamaForCausalLM, OPTModel
 
 
 def flatten_input_embeds(input_embeds):
@@ -17,6 +17,8 @@ def get_embeds(model, input_ids):
     elif isinstance(model, FalconForCausalLM):
         inputs_embeds = model.transformer.word_embeddings(input_ids)
     elif isinstance(model, OpenLlamaForCausalLM):
+        inputs_embeds = model.model.embed_tokens(input_ids)
+    elif isinstance(model, OPTModel):
         inputs_embeds = model.model.embed_tokens(input_ids)
     else:
         raise ValueError(f"model {model} not supported")
