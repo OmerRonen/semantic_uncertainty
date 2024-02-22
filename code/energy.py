@@ -57,9 +57,9 @@ def get_energy_logits(pre_softmax, first_only=False, sequence_average=False, sum
     pre_softmax = pre_softmax.to(dtype=torch.float64)
     if sum_det:
         return get_energy_sum_det(pre_softmax)
-    # energy_total = None
-    energy_vec = []
-    temp = 1
+    energy_total = None
+    # energy_vec = []
+    temp = 0.1
     if len(pre_softmax.shape) == 2:
         pre_softmax = pre_softmax.unsqueeze(0)
     vocab_size = pre_softmax.shape[2]
@@ -76,7 +76,7 @@ def get_energy_logits(pre_softmax, first_only=False, sequence_average=False, sum
         log_c = token_pre_softmax.logsumexp(dim=-1)
         one_over_probs = 1 / probs  # torch.clamp(1 / probs, min=1e-10, max=1e10)
         # make all the values above thres 1
-        one_over_probs = torch.where(one_over_probs > thres, torch.ones_like(one_over_probs), one_over_probs)
+        # one_over_probs = torch.where(one_over_probs > thres, torch.ones_like(one_over_probs), one_over_probs)
         factor_mul_log = 2 * torch.sum(torch.log(one_over_probs))
         c_term = torch.exp(-2 * log_c)
         energy = factor_mul_log + torch.log(1 + torch.sum((probs ** 2)) * c_term)
@@ -85,16 +85,16 @@ def get_energy_logits(pre_softmax, first_only=False, sequence_average=False, sum
         if sequence_average:
             denominator *= pre_softmax.shape[1]
 
-        energy_vec.append(energy / denominator)
-        #
-        # if energy_total is None:
-        #     energy_total = energy / denominator
-        # else:
-        #     energy_total += energy / denominator
+        # energy_vec.append(energy / denominator)
+
+        if energy_total is None:
+            energy_total = energy / denominator
+        else:
+            energy_total += energy / denominator
         if first_only:
             break
     # print(np.mean(energies))
-    energy_total = torch.stack(energy_vec, dim=0).logsumexp(dim=0)
+    # energy_total = torch.stack(energy_vec, dim=0).logsumexp(dim=0)
     return energy_total
 
 
