@@ -112,7 +112,7 @@ def get_neg_loglikelihoods(model, sequences):
 
                 # print(model_output['logits'].shape)
                 # logits = model_output['logits']
-                logits_new = torch.cat(logits.scores)
+                logits_new = torch.cat(logits)
                 energies[generation_index] = get_energy_logits(logits_new)
                 energies_first_token[generation_index] = get_energy_logits(logits_new, first_only=True)
                 energies_average_over_sequence[generation_index] = get_energy_logits(logits_new, sequence_average=True)
