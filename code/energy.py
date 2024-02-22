@@ -16,7 +16,7 @@ class LLModel(nn.Module):
         self.model = model
         self.max_length = max_length
         self.hidden_dim = hidden_dim
-        self.device = "gpu" if torch.cuda.is_available() else "cpu"
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.tokenizer = tokenizer
         self.model.to(self.device)
 
