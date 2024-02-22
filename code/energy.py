@@ -69,9 +69,14 @@ def get_energy_logits(pre_softmax, first_only=False, sequence_average=False, sum
         token_pre_softmax = pre_softmax[:, i, :]
         token_pre_softmax = token_pre_softmax / temp
         probs = torch.softmax(token_pre_softmax, dim=-1)
+        top_100_probs = torch.topk(probs, k=100, dim=-1).values
+        one_over_top_k_probs = 1 / top_100_probs
+        thres = one_over_top_k_probs.max()
 
         log_c = token_pre_softmax.logsumexp(dim=-1)
         one_over_probs = 1 / probs  # torch.clamp(1 / probs, min=1e-10, max=1e10)
+        # make all the values above thres 1
+        one_over_probs = torch.where(one_over_probs > thres, torch.ones_like(one_over_probs), one_over_probs)
         factor_mul_log = 2 * torch.sum(torch.log(one_over_probs))
         c_term = torch.exp(-2 * log_c)
         energy = factor_mul_log + torch.log(1 + torch.sum((probs ** 2)) * c_term)
