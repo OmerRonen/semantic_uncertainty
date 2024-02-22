@@ -45,7 +45,7 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-large-mnli")
     model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-large-mnli").to(device)
 
-    wandb.init(project='nlg_uncertainty', id=args.run_id, config=args, resume='allow')
+    # wandb.init(project='nlg_uncertainty', id=args.run_id, config=args, resume='allow')
 
     run_name = args.run_id
 

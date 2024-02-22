@@ -45,7 +45,7 @@ tokenizer = AutoTokenizer.from_pretrained(f"facebook/{args.evaluation_model}",
                                           use_fast=False,
                                           cache_dir=config.data_dir)
 
-wandb.init(project='nlg_uncertainty', id=args.run_id, config=args, resume='allow')
+# wandb.init(project='nlg_uncertainty', id=args.run_id, config=args, resume='allow')
 
 run_name = args.run_id
 
