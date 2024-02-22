@@ -7,6 +7,22 @@ from torch.func import jacfwd
 from torch.distributions import Distribution
 
 
+def get_energy_sum_det(logits):
+    logits = logits.to(dtype=torch.float64)
+    probs = torch.nn.functional.softmax(logits, dim=-1)
+    probs = probs ** (-2)
+    # sum probs over the sequence
+    probs = probs.sum(dim=1)
+    # calculate the normalizing constant to the power of -2
+    normalizing_constant_log = -2 * logits.logsumexp(dim=1)
+    # sum over the sequence
+    normalizing_constant_log = normalizing_constant_log.logsumexp(dim=1)
+    # multiply the probs along the vocab dimension
+    probs_log_factor = torch.log(probs).sum(dim=1)
+    c_log_factor = torch.log(1 + (probs ** (-1)).sum() * torch.exp(normalizing_constant_log))
+    energy = probs_log_factor + c_log_factor
+    return energy
+
 def calculate_energy(X, model, mu=None, sigma=None, batch_size=32, fast=True):
     # calculate gaussian density of input
     model.eval()
@@ -37,8 +53,10 @@ def calculate_energy(X, model, mu=None, sigma=None, batch_size=32, fast=True):
     return log_density
 
 
-def get_energy_logits(pre_softmax, first_only=False, sequence_average=False):
+def get_energy_logits(pre_softmax, first_only=False, sequence_average=False, sum_det=False):
     pre_softmax = pre_softmax.to(dtype=torch.float64)
+    if sum_det:
+        return get_energy_sum_det(pre_softmax)
     # energy_total = None
     energy_vec = []
     temp = 1
