@@ -114,7 +114,8 @@ def get_neg_loglikelihoods(model, sequences):
                 model.hidden_dim = inputs_embeds.shape[-1]
                 f_input_embeds = flatten_input_embeds(inputs_embeds)
                 # continue
-                energy = llm.get_energy(f_input_embeds)
+                if generation_index == 0:
+                    energy = llm.get_energy(f_input_embeds)
 
 
                 # print(model_output['logits'].shape)
