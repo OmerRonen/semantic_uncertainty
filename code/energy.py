@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import torch
 
@@ -9,6 +11,8 @@ from transformers import PreTrainedModel, AutoTokenizer
 
 from utils import unflatten_input_embeds, get_embeds
 
+LOGGER = logging.getLogger("likelihood")
+logging.basicConfig(level=logging.INFO)
 
 class LLModel(nn.Module):
     def __init__(self, model: PreTrainedModel, tokenizer: AutoTokenizer, hidden_dim, max_length=10):
@@ -40,6 +44,41 @@ class LLModel(nn.Module):
         results =  torch.cat(new_logits_list, dim=1)
         print(f"results shape: {results.shape}")
         return results
+
+    def get_energy(self, input_embeds: torch.Tensor):
+        """Returns the energy of the input tokens"""
+        probs = []
+        dets = []
+        n_words = input_embeds.shape[1] // self.hidden_dim
+        shape = (n_words, self.hidden_dim)
+        input_embeds = unflatten_input_embeds(input_embeds, shape)
+        LOGGER.info(f"input_embeds shape: {input_embeds.shape}")
+        for i in range(self.max_length):
+            new_logits = self.model(inputs_embeds=input_embeds).logits[:, -1, :].unsqueeze(1)
+            if i > 0:
+                # take numeric derivative of new_logits with respect to new_embed
+                eps = 1e-4
+                der = torch.zeros(size=(input_embeds.shape[2], new_logits,shape[-1]))
+                LOGGER.info(f"der shape: {der.shape}")
+                for j in tqdm(range(input_embeds.shape[2])):
+                    input_embeds_j = input_embeds.clone()
+                    input_embeds_j[:, j, :] += eps
+                    dy = self.model(inputs_embeds=input_embeds_j).logits[:, -1, :].unsqueeze(1) - new_logits
+                    der[j, ...] = dy / eps
+
+                probs_arr = get_probs(self.model, input_embeds, pre_softmax=new_logits)
+                LOGGER.info(f"probs_arr shape: {probs_arr.shape}")
+                g = der @ probs_arr
+                LOGGER.info(f"g shape: {g.shape}")
+                log_det = torch.log(torch.svd(g)[1]).sum(dim=1)
+                dets.append(log_det)
+            new_probs = torch.softmax(new_logits, dim=-1)
+            probs.append(new_probs)
+            new_token = new_logits.argmax(-1)
+            new_embed = get_embeds(self.model, new_token)
+            input_embeds = torch.cat([input_embeds, new_embed], dim=1)
+
+
 
 
 
@@ -232,7 +271,7 @@ def calculate_det_grad(X, net, llm=True):
     return dets
 
 
-def net_derivative(x, net, option=4, derivative=False, llm=True):
+def net_derivative(x, net, option=4, derivative=False, llm_idx=0):
     net.eval()
     # LOGGER.debug(f"model device: {x.device}")
 
@@ -272,6 +311,7 @@ def net_derivative(x, net, option=4, derivative=False, llm=True):
     elif option == 4:
         torch.cuda.empty_cache()
         eps = 1e-4
+        # take x grad to be all the entires in x that require grad
         batch_size, latent_dim = x.shape
         pred_x = net(x.clone()).detach().cpu()
         n_preds, length_seq, dict_size = pred_x.shape
@@ -288,11 +328,6 @@ def net_derivative(x, net, option=4, derivative=False, llm=True):
         n_batches = int(np.ceil(dxs.shape[0] / _batch_size))
         batches = np.arange(0, n_batches, 1)
         dys_vec_batches = []
-        # if llm:
-        #     # sample 10 pct of the total number of batches
-        #     batches = np.random.choice(batches, int(0.1 * n_batches), replace=False)
-        # J = torch.zeros((n_preds, latent_dim, length_seq, dict_size)).cpu()  # loop will fill in Jacobian
-
         for batch_idx in tqdm(batches):
             start_idx = batch_idx * _batch_size
             end_idx = (batch_idx + 1) * _batch_size

@@ -59,7 +59,7 @@ with open(f'{config.output_dir}/{run_name}/{args.generation_model}_generations_s
 
 
 def get_neg_loglikelihoods(model, sequences):
-    llm = LLModel(model=model, tokenizer=tokenizer, max_length=5, hidden_dim=model.config.hidden_size)
+    llm = LLModel(model=model, tokenizer=tokenizer, max_length=3, hidden_dim=model.config.hidden_size)
     with torch.no_grad():
         result = []
         for sample in sequences:
@@ -114,7 +114,7 @@ def get_neg_loglikelihoods(model, sequences):
                 model.hidden_dim = inputs_embeds.shape[-1]
                 f_input_embeds = flatten_input_embeds(inputs_embeds)
                 # continue
-                energy = calculate_density(f_input_embeds, llm, mu=None, sigma=None, fast=False).detach().cpu().numpy()
+                energy = llm.calculate_energy(f_input_embeds, logits)
 
 
                 # print(model_output['logits'].shape)
