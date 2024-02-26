@@ -68,7 +68,7 @@ class LLModel(nn.Module):
 
                 probs_arr = get_probs(self.model, input_embeds, pre_softmax=new_logits)
                 LOGGER.info(f"probs_arr shape: {probs_arr.shape}")
-                g = der @ probs_arr
+                g = torch.pinverse(der).transpose(1, 0) @ probs_arr
                 LOGGER.info(f"g shape: {g.shape}")
                 log_det = torch.log(torch.svd(g)[1]).sum(dim=1)
                 dets.append(log_det)
