@@ -66,13 +66,13 @@ class LLModel(nn.Module):
                     dy = self.model(inputs_embeds=input_embeds_j).logits[:, -1, :].unsqueeze(1) - new_logits
                     der[j, ...] = dy / eps
 
-                probs_arr = torch.squeeze(get_probs(self.model, input_embeds, pre_softmax=new_logits)).detach().cpu()
-                LOGGER.info(f"probs_arr shape: {probs_arr.shape}")
-                inv_der = torch.pinverse(der.detach().cpu()).transpose(1, 0)
-                LOGGER.info(f"inv_der shape: {inv_der.shape}")
-                g = inv_der @ probs_arr
+                # probs_arr = torch.squeeze(get_probs(self.model, input_embeds, pre_softmax=new_logits)).detach().cpu()
+                # LOGGER.info(f"probs_arr shape: {probs_arr.shape}")
+                # inv_der = torch.pinverse(der.detach().cpu()).transpose(1, 0)
+                # LOGGER.info(f"inv_der shape: {inv_der.shape}")
+                g = der @ der.transpose(0, 1)
                 LOGGER.info(f"g shape: {g.shape}")
-                log_det = torch.log(torch.svd(g)[1]).sum(dim=1)
+                log_det = (-1 * torch.log(torch.svd(g)[1])).sum(dim=1)
                 dets.append(log_det)
             new_probs = torch.softmax(new_logits, dim=-1)
             probs.append(new_probs)
