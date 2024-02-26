@@ -66,7 +66,7 @@ class LLModel(nn.Module):
                     dy = self.model(inputs_embeds=input_embeds_j).logits[:, -1, :].unsqueeze(1) - new_logits
                     der[j, ...] = dy / eps
 
-                probs_arr = get_probs(self.model, input_embeds, pre_softmax=new_logits.unsqueeze(0))
+                probs_arr = get_probs(self.model, input_embeds, pre_softmax=new_logits)
                 LOGGER.info(f"probs_arr shape: {probs_arr.shape}")
                 g = torch.pinverse(der).transpose(1, 0) @ probs_arr
                 LOGGER.info(f"g shape: {g.shape}")
@@ -214,7 +214,7 @@ def get_probs(net, X, pre_softmax=None, derivative=False, fast=False):
 
         log_c = token_pre_softmax.logsumexp(dim=1)
         c = torch.exp(log_c)
-        c_vec = (c.view(-1, 1) * torch.ones(n_preds, dict_size)).unsqueeze(1)
+        c_vec = (c.view(-1, 1) * torch.ones(n_preds, dict_size).to(device=c.device)).unsqueeze(1)
         one_over_probs = 1 / probs  # torch.clamp(1 / probs, min=1e-10, max=1e10)
         if not fast:
             p_diag = torch.diag_embed(one_over_probs)

@@ -9,6 +9,7 @@ def flatten_input_embeds(input_embeds):
 def unflatten_input_embeds(input_embeds, input_shape):
     return input_embeds.reshape(input_embeds.shape[0], *input_shape)
 
+
 def get_embeds(model, input_ids):
     if isinstance(model, GPT2LMHeadModel):
         inputs_embeds = model.transformer.wte(input_ids)
@@ -23,6 +24,8 @@ def get_embeds(model, input_ids):
     else:
         raise ValueError(f"model {model} not supported")
     return inputs_embeds
+
+
 def to_cpu(obj):
     """
     Recursively moves tensors in a dictionary or in any nested structure
