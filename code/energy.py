@@ -77,6 +77,10 @@ class LLModel(nn.Module):
             new_token = new_logits.argmax(-1)
             new_embed = get_embeds(self.model, new_token)
             input_embeds = torch.cat([input_embeds, new_embed], dim=1)
+        log_probs_sum = torch.log(torch.stack(probs, dim=1)).sum(dim=1)
+        log_dets_sum = torch.stack(dets, dim=1).sum(dim=1)
+        total_energy = log_probs_sum + log_dets_sum
+        return total_energy
 
 
 
