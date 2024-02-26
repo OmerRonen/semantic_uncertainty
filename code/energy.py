@@ -58,7 +58,7 @@ class LLModel(nn.Module):
             if i > 0:
                 # take numeric derivative of new_logits with respect to new_embed
                 eps = 1e-4
-                der = torch.zeros(size=(input_embeds.shape[2], new_logits,shape[-1]))
+                der = torch.zeros(size=(input_embeds.shape[2], new_logits.shape[-1]))
                 LOGGER.info(f"der shape: {der.shape}")
                 for j in tqdm(range(input_embeds.shape[2])):
                     input_embeds_j = input_embeds.clone()
