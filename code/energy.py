@@ -66,7 +66,7 @@ class LLModel(nn.Module):
                     dy = self.model(inputs_embeds=input_embeds_j).logits[:, -1, :].unsqueeze(1) - new_logits
                     der[j, ...] = dy / eps
 
-                probs_arr = get_probs(self.model, input_embeds, pre_softmax=new_logits)
+                probs_arr = get_probs(self.model, input_embeds, pre_softmax=new_logits.unsqueeze(0))
                 LOGGER.info(f"probs_arr shape: {probs_arr.shape}")
                 g = torch.pinverse(der).transpose(1, 0) @ probs_arr
                 LOGGER.info(f"g shape: {g.shape}")
