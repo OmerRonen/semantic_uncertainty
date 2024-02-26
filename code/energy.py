@@ -74,7 +74,7 @@ class LLModel(nn.Module):
                 LOGGER.info(f"g shape: {g.shape}")
                 eigenvalues = torch.svd(g)[1] ** (-1)
                 LOGGER.info(f"eigenvalues: {eigenvalues}")
-                log_det = (0.5 * torch.log(eigenvalues[0:10])).sum()
+                log_det = (0.5 * torch.log(eigenvalues[0:30])).sum()
                 LOGGER.info(f"log_det: {log_det}")
                 # log_det = (-1 * torch.log(torch.svd(g)[1])).sum(dim=1)
                 dets.append(log_det)
