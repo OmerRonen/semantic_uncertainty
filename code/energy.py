@@ -75,6 +75,7 @@ class LLModel(nn.Module):
                 eigenvalues = torch.svd(g)[1] ** (-1)
                 LOGGER.info(f"eigenvalues: {eigenvalues}")
                 log_det = (0.5 * torch.log(eigenvalues)).sum()
+                LOGGER.info(f"log_det: {log_det}")
                 # log_det = (-1 * torch.log(torch.svd(g)[1])).sum(dim=1)
                 dets.append(log_det)
             new_probs = torch.softmax(new_logits, dim=-1)
@@ -83,7 +84,7 @@ class LLModel(nn.Module):
             new_embed = get_embeds(self.model, new_token)
             input_embeds = torch.cat([input_embeds, new_embed], dim=1)
         log_probs_sum = torch.log(torch.stack(probs, dim=1)).sum(dim=1)
-        log_dets_sum = torch.stack(dets, dim=1).sum(dim=1)
+        log_dets_sum = torch.sum(torch.stack(dets, dim=0), dim=0)
         total_energy = log_probs_sum + log_dets_sum
         return total_energy
 
