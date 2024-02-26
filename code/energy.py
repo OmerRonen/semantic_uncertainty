@@ -86,6 +86,7 @@ class LLModel(nn.Module):
         log_probs_sum = torch.log(torch.stack(probs, dim=1)).sum(dim=1)
         log_dets_sum = torch.sum(torch.stack(dets, dim=0), dim=0)
         total_energy = log_probs_sum + log_dets_sum
+        print(total_energy)
         return total_energy
 
 
