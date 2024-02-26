@@ -10,7 +10,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import wandb
 
 from utils import to_cpu, get_embeds, flatten_input_embeds
-from energy import get_energy_logits, LLModel, calculate_density
+from energy import get_energy_logits, LLModel
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--evaluation_model', type=str, default='opt-2.7b')
@@ -114,7 +114,7 @@ def get_neg_loglikelihoods(model, sequences):
                 model.hidden_dim = inputs_embeds.shape[-1]
                 f_input_embeds = flatten_input_embeds(inputs_embeds)
                 # continue
-                energy = llm.calculate_energy(f_input_embeds, logits)
+                energy = llm.get_energy(f_input_embeds)
 
 
                 # print(model_output['logits'].shape)
