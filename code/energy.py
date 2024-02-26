@@ -62,7 +62,7 @@ class LLModel(nn.Module):
                 LOGGER.info(f"der shape: {der.shape}")
                 for j in tqdm(range(input_embeds.shape[2])):
                     input_embeds_j = input_embeds.clone()
-                    input_embeds_j[:, j, :] += eps
+                    input_embeds_j[:, :, j] += eps
                     dy = self.model(inputs_embeds=input_embeds_j).logits[:, -1, :].unsqueeze(1) - new_logits
                     der[j, ...] = dy / eps
 
